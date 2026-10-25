@@ -26,6 +26,7 @@ def main() -> None:
     er = sub.add_parser("eval-rollout", help="score predicted videos (directory)")
     er.add_argument("--data", type=Path, required=True)
     er.add_argument("--pred", type=Path, required=True)
+    er.add_argument("--workers", type=int, default=8)
 
     b = sub.add_parser("baseline", help="write baseline predictions")
     b.add_argument("--data", type=Path, required=True)
@@ -39,7 +40,7 @@ def main() -> None:
     elif args.cmd == "eval-outcome":
         print(json.dumps(evaluate.eval_outcome(args.data, args.pred), indent=2))
     elif args.cmd == "eval-rollout":
-        print(json.dumps(evaluate.eval_rollout(args.data, args.pred), indent=2))
+        print(json.dumps(evaluate.eval_rollout(args.data, args.pred, args.workers), indent=2))
     elif args.cmd == "baseline":
         if args.name in baselines.OUTCOME_BASELINES:
             baselines.run_outcome_baseline(args.name, args.data, args.out)
