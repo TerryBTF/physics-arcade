@@ -28,6 +28,13 @@ def main() -> None:
     er.add_argument("--pred", type=Path, required=True)
     er.add_argument("--workers", type=int, default=8)
 
+    v = sub.add_parser("visualize", help="side-by-side GT vs prediction video for one episode")
+    v.add_argument("--data", type=Path, required=True)
+    v.add_argument("--pred", type=Path, required=True, help="prediction directory")
+    v.add_argument("--ep", required=True)
+    v.add_argument("--out", type=Path, required=True)
+    v.add_argument("--label", default="prediction")
+
     b = sub.add_parser("baseline", help="write baseline predictions")
     b.add_argument("--data", type=Path, required=True)
     b.add_argument("--name", required=True, choices=[*baselines.OUTCOME_BASELINES, *baselines.ROLLOUT_BASELINES, "oracle"])
@@ -41,6 +48,11 @@ def main() -> None:
         print(json.dumps(evaluate.eval_outcome(args.data, args.pred), indent=2))
     elif args.cmd == "eval-rollout":
         print(json.dumps(evaluate.eval_rollout(args.data, args.pred, args.workers), indent=2))
+    elif args.cmd == "visualize":
+        from .angry_birds.visualize import compare_video
+
+        pred = next(args.pred / f"{args.ep}{e}" for e in (".mp4", ".gif", ".npy") if (args.pred / f"{args.ep}{e}").exists())
+        print(json.dumps(compare_video(args.data, pred, args.ep, args.out, args.label)))
     elif args.cmd == "baseline":
         if args.name in baselines.OUTCOME_BASELINES:
             baselines.run_outcome_baseline(args.name, args.data, args.out)
