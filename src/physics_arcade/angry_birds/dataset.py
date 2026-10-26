@@ -63,6 +63,8 @@ def _write_one(args: tuple[int, str, str]) -> dict:
         "blocks_initial": ep.blocks_initial,
         "blocks_destroyed": ep.blocks_destroyed,
         "first_contact_time": ep.first_contact_time,
+        "attempt": ep.attempt,
+        "launch": {"speed": ep.speed, "angle_deg": ep.angle},
     }
     (ans / f"{eid}.json").write_text(json.dumps(answer, indent=1))
 

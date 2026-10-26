@@ -69,7 +69,7 @@ def segment(frame: np.ndarray, style: str = "flat") -> np.ndarray:
     """Map an RGB frame (H, W, 3) to class indices (H, W).
 
     Flat frames use the nearest palette color; cartoon frames use a color table
-    fitted on rendered episodes (see cartoon.fit_lut).
+    fitted on rendered episodes (see cartoon.build_lut).
     """
     if style == "flat":
         lut = _LUT

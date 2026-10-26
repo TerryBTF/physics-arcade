@@ -34,6 +34,7 @@ SETTLE_SPEED = 8.0  # px/s; episode must be at rest by the last frame
 @dataclass
 class Episode:
     seed: int
+    attempt: int  # index of the accepted setup, for setup_for()
     speed: float
     angle: float
     frames: list[np.ndarray]  # flat style; the source of ground-truth class masks
@@ -75,10 +76,21 @@ def _choose_launch(world: World, rng: random.Random) -> tuple[float, float] | No
     return None
 
 
-def generate_episode(seed: int, style: str = "flat", max_tries: int = 50) -> Episode:
-    """Deterministically generate an episode from a seed (retrying internally on rejects)."""
+@dataclass
+class Setup:
+    """A settled level with a chosen launch, just before the bird is fired."""
+
+    attempt: int
+    world: World
+    speed: float
+    angle: float
+
+
+def setups(seed: int, max_tries: int = 50):
+    """Yield every candidate setup for `seed` in order. Random numbers are consumed
+    only here (never during rollouts), so replaying the first k setups is exact."""
     rng = random.Random(seed)
-    for _ in range(max_tries):
+    for attempt in range(max_tries):
         world = generate_level(rng)
         if not world.pigs:
             continue
@@ -89,23 +101,50 @@ def generate_episode(seed: int, style: str = "flat", max_tries: int = 50) -> Epi
         launch = _choose_launch(world, rng)
         if launch is None:
             continue
-        speed, angle = launch
+        yield Setup(attempt, world, *launch)
 
-        pigs_initial = {p.pig_id: (*p.body.position, p.size[0]) for p in world.pigs}
-        blocks_initial = sum(o.kind not in ("pig", "bird") for o in world.objects)
-        world.time = 0.0
-        world.damage_enabled = True
-        launch_bird(world, speed, angle)
-        styled = style != "flat"
-        first = render(world)
-        first_display = render_cartoon(world) if styled else first
-        labeled = label_pigs(first_display, world)
-        frames, display = [np.asarray(first)], [np.asarray(first_display)]
+
+def setup_for(seed: int, attempt: int) -> Setup:
+    """Rebuild the setup that `generate_episode(seed)` accepted (see Episode.attempt)."""
+    for s in setups(seed):
+        if s.attempt == attempt:
+            return s
+    raise ValueError(f"seed {seed} has no setup with attempt {attempt}")
+
+
+def rollout(world: World, speed: float, angle: float, style: str | None = "flat"):
+    """Fire the bird and simulate TOTAL_FRAMES frames. With style=None nothing is rendered.
+
+    Returns (frames, display_frames, labeled_first_frame); the lists are empty when style is None.
+    """
+    world.time = 0.0
+    world.damage_enabled = True
+    launch_bird(world, speed, angle)
+    if style is None:
         for _ in range(TOTAL_FRAMES - 1):
             for _ in range(STEPS_PER_FRAME):
                 step(world)
-            frames.append(np.asarray(render(world)))
-            display.append(np.asarray(render_cartoon(world)) if styled else frames[-1])
+        return [], [], None
+    styled = style != "flat"
+    first = render(world)
+    first_display = render_cartoon(world) if styled else first
+    labeled = label_pigs(first_display, world)
+    frames, display = [np.asarray(first)], [np.asarray(first_display)]
+    for _ in range(TOTAL_FRAMES - 1):
+        for _ in range(STEPS_PER_FRAME):
+            step(world)
+        frames.append(np.asarray(render(world)))
+        display.append(np.asarray(render_cartoon(world)) if styled else frames[-1])
+    return frames, display, labeled
+
+
+def generate_episode(seed: int, style: str = "flat", max_tries: int = 50) -> Episode:
+    """Deterministically generate an episode from a seed (retrying internally on rejects)."""
+    for s in setups(seed, max_tries):
+        world = s.world
+        pigs_initial = {p.pig_id: (*p.body.position, p.size[0]) for p in world.pigs}
+        blocks_initial = sum(o.kind not in ("pig", "bird") for o in world.objects)
+        frames, display, labeled = rollout(world, s.speed, s.angle, style)
 
         # Bird must still be in free flight for the whole context window.
         ctx_t = CONTEXT_FRAMES / FPS
@@ -115,8 +154,9 @@ def generate_episode(seed: int, style: str = "flat", max_tries: int = 50) -> Epi
             continue
         return Episode(
             seed=seed,
-            speed=speed,
-            angle=angle,
+            attempt=s.attempt,
+            speed=s.speed,
+            angle=s.angle,
             frames=frames,
             display_frames=display,
             labeled_first_frame=labeled,

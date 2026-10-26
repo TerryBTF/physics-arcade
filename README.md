@@ -51,6 +51,16 @@ frame with pig ids) are what a model may see; `answers/` holds the hidden ground
 | Rollout | ground-truth video (upper bound) | mIoU 0.95 | mIoU 0.93 |
 | Rollout | freeze last context frame | mIoU 0.41 | mIoU 0.41 |
 
+## Predictability
+
+`physics-arcade predictability` re-simulates every episode 50 times from its exact
+pre-launch scene under small perturbations and records how often each pig's fate
+matches the recorded one. Collisions are chaotic: with launch noise of only 0.25 %
+speed / 0.1°, 35 % of episodes keep the same outcome in every run and 16 % of pigs
+flip in 10–90 % of runs. The per-pig majority vote of a perfect simulator fed a
+realistic launch estimate (1 % / 0.5°) reaches 0.94 balanced accuracy, a practical
+ceiling for the outcome track.
+
 ## Models
 
 `models/cosmos/` runs NVIDIA Cosmos-Predict2-2B-Video2World (diffusers) in its own

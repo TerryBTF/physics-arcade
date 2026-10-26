@@ -31,37 +31,29 @@ import torch
 from diffusers import Cosmos2VideoToWorldPipeline
 from huggingface_hub import snapshot_download
 from PIL import Image
+from timing import BENCH_FPS, COSMOS_FPS, NUM_FRAMES, cond_indices, to_benchmark_frames
 
 MODEL_ID = "nvidia/Cosmos-Predict2-2B-Video2World"
-BENCH_FPS, COSMOS_FPS = 30, 16
-NUM_FRAMES, NUM_COND = 93, 5
 OUT_W, OUT_H = 640, 360
 
-PROMPT = (
-    "A side-view 2D physics game rendered with flat colors and a fixed camera. A small red bird has been "
-    "launched from a slingshot on the left and flies along a ballistic arc toward structures built from "
-    "brown wood, gray stone and pale blue ice blocks, with round green pigs resting on and between them. "
-    "The bird hits the structures; blocks are pushed, topple and fall under gravity, and pigs that are "
-    "struck hard or crushed disappear. Everything settles to rest on the green ground. The sky is plain "
-    "light blue, the camera never moves, there is no text, no shading and no new objects appear."
+SCENE = (
+    "A small red bird has been launched from a slingshot on the left and flies along a ballistic arc toward "
+    "structures built from brown wood, gray stone and pale blue ice blocks, with round green pigs resting on "
+    "and between them. The bird hits the structures; blocks are pushed, topple and fall under gravity, and pigs "
+    "that are struck hard or crushed disappear. Everything settles to rest on the ground. The camera never moves "
+    "and no new objects appear."
 )
+PROMPTS = {
+    "flat": "A side-view 2D physics game rendered with flat solid colors, no shading and no text. " + SCENE
+    + " The sky is plain light blue and the ground is plain green.",
+    "cartoon": "A side-view 2D cartoon physics game with a blue sky, white clouds, hills and grass. " + SCENE
+    + " The pigs have simple cartoon faces; wood has grain, stone is speckled and ice is glossy.",
+}
 NEGATIVE_PROMPT = (
     "camera motion, zoom, panning, shaky footage, motion blur, 3D rendering, realistic textures, shading, "
     "lighting changes, new objects appearing, objects changing color, text, watermark, flickering, "
     "low frame rate, artifacting, distorted shapes."
 )
-
-
-def cond_indices(n_ctx: int) -> list[int]:
-    last = n_ctx - 1
-    return [int(np.clip(round(last - (NUM_COND - 1 - i) * BENCH_FPS / COSMOS_FPS), 0, last)) for i in range(NUM_COND)]
-
-
-def future_to_cosmos_index(n_ctx: int, n_future: int) -> np.ndarray:
-    """Index into the 93 generated frames for each scored future frame."""
-    last = n_ctx - 1
-    t = (np.arange(n_ctx, n_ctx + n_future) - last) / BENCH_FPS  # seconds after last context frame
-    return np.clip(np.round(NUM_COND - 1 + t * COSMOS_FPS), 0, NUM_FRAMES - 1).astype(int)
 
 
 def main() -> None:
@@ -89,7 +81,6 @@ def main() -> None:
     pipe.enable_model_cpu_offload()  # T5-XXL + DiT + VAE do not fit in 16 GB together
 
     cidx = cond_indices(n_ctx)
-    fidx = future_to_cosmos_index(n_ctx, n_future)
     log = []
     for task in tasks:
         eid = task["id"]
@@ -100,7 +91,7 @@ def main() -> None:
         t0 = time.time()
         frames = pipe(
             video=cond,
-            prompt=PROMPT,
+            prompt=PROMPTS[manifest.get("style", "flat")],
             negative_prompt=NEGATIVE_PROMPT,
             height=args.height,
             width=args.width,
@@ -111,7 +102,7 @@ def main() -> None:
             generator=torch.Generator().manual_seed(args.seed),
             output_type="pil",
         ).frames[0]
-        future = np.stack([np.asarray(frames[k].resize((OUT_W, OUT_H), Image.BICUBIC)) for k in fidx])
+        future = to_benchmark_frames(frames, n_ctx, n_future, (OUT_W, OUT_H))
         iio.imwrite(dst, future, fps=BENCH_FPS, codec="libx264", quality=9, macro_block_size=1)
         dt = time.time() - t0
         log.append({"id": eid, "seconds": round(dt, 1), "peak_vram_gb": round(torch.cuda.max_memory_allocated() / 1e9, 2)})

@@ -3,7 +3,7 @@ the flat renderer. All artwork is original and procedural.
 
 Ground-truth class masks always come from the flat renderer. Each class keeps its
 own hue family (outlines and textures are darker or lighter shades of the base
-color), so a color lookup table fitted on rendered frames (see `fit_lut`) can
+color), so a color lookup table fitted on rendered frames (see `build_lut`) can
 still map cartoon pixels back to classes for scoring.
 """
 
@@ -185,19 +185,20 @@ def render_cartoon(world: World) -> Image.Image:
 # Segmentation of cartoon frames
 
 
-def fit_lut(frames: np.ndarray, masks: np.ndarray, n_classes: int) -> np.ndarray:
-    """Learn a 6-bit-per-channel color -> class table from (frames, masks) pairs.
-
-    Each populated color bin takes its majority class; empty bins take the class
-    of the nearest populated bin so unseen colors (e.g. from a generative model)
-    still get a sensible label.
-    """
-    from scipy.spatial import cKDTree
-
+def color_counts(frames: np.ndarray, masks: np.ndarray, n_classes: int) -> np.ndarray:
+    """(64**3, n_classes) histogram of 6-bit-per-channel colors per ground-truth class."""
     q = frames.reshape(-1, 3) >> 2
     idx = (q[:, 0].astype(np.int64) << 12) | (q[:, 1].astype(np.int64) << 6) | q[:, 2]
-    counts = np.zeros((64**3, n_classes), dtype=np.int64)
-    np.add.at(counts, (idx, masks.reshape(-1).astype(np.int64)), 1)
+    flat = idx * n_classes + masks.reshape(-1)
+    return np.bincount(flat, minlength=64**3 * n_classes).reshape(64**3, n_classes)
+
+
+def lut_from_counts(counts: np.ndarray) -> np.ndarray:
+    """Each populated color bin takes its majority class; empty bins take the class
+    of the nearest populated bin so unseen colors (e.g. from a generative model)
+    still get a sensible label."""
+    from scipy.spatial import cKDTree
+
     seen = counts.sum(1) > 0
     lut = counts.argmax(1).astype(np.uint8)
     grid = np.stack(np.unravel_index(np.arange(64**3), (64, 64, 64)), axis=1)
@@ -216,31 +217,28 @@ def cartoon_lut() -> np.ndarray:
 def build_lut(n_episodes: int = 60, seed_offset: int = 900_000, workers: int = 8) -> dict:
     """Fit the cartoon LUT on held-out seeds and save it next to this module.
 
-    Frames are round-tripped through the same H.264 settings the dataset uses, so
-    codec color bleeding at edges is part of the training data.
+    Frames are round-tripped through the same H.264 settings the dataset uses, and
+    through a bicubic upscale/downscale like the one video models' outputs go
+    through, so codec bleeding and resampling ringing at edges are part of the
+    training data.
     """
     from concurrent.futures import ProcessPoolExecutor
 
-    from .render import CLASSES
-
     with ProcessPoolExecutor(max_workers=workers) as pool:
-        parts = list(pool.map(_lut_samples, range(seed_offset, seed_offset + n_episodes)))
-    frames = np.concatenate([p[0] for p in parts])
-    masks = np.concatenate([p[1] for p in parts])
-    lut = fit_lut(frames, masks, len(CLASSES))
+        counts = sum(pool.map(_lut_counts, range(seed_offset, seed_offset + n_episodes)))
+    lut = lut_from_counts(counts)
     np.save(LUT_PATH, lut)
-    q = frames >> 2
-    pred = lut[(q[..., 0].astype(np.int64) << 12) | (q[..., 1].astype(np.int64) << 6) | q[..., 2]]
-    return {"frames": len(frames), "pixel_accuracy_on_fit_set": float((pred == masks).mean()), "out": str(LUT_PATH)}
+    correct = counts[np.arange(len(lut)), lut].sum()
+    return {"pixels": int(counts.sum()), "pixel_accuracy_on_fit_set": float(correct / counts.sum()), "out": str(LUT_PATH)}
 
 
-def _lut_samples(seed: int) -> tuple[np.ndarray, np.ndarray]:
+def _lut_counts(seed: int) -> np.ndarray:
     import io
 
     import imageio.v3 as iio
 
     from .episode import generate_episode
-    from .render import segment
+    from .render import CLASSES, segment
     from .sim import FPS
 
     ep = generate_episode(seed, "cartoon")
@@ -250,4 +248,8 @@ def _lut_samples(seed: int) -> tuple[np.ndarray, np.ndarray]:
     sel = slice(0, None, 6)
     raw = np.stack(ep.display_frames[sel])
     masks = np.stack([segment(f) for f in ep.frames[sel]])
-    return np.concatenate([raw, decoded[sel]]), np.concatenate([masks, masks])
+    h, w = raw.shape[1:3]
+    resampled = np.stack(
+        [np.asarray(Image.fromarray(f).resize((1280, 704), Image.BICUBIC).resize((w, h), Image.BICUBIC)) for f in decoded[sel]]
+    )
+    return color_counts(np.concatenate([raw, decoded[sel], resampled]), np.concatenate([masks, masks, masks]), len(CLASSES))

@@ -4,3 +4,4 @@ preds/
 __pycache__/
 viz/
 models/*/.venv/
+analysis/

@@ -38,6 +38,12 @@ def main() -> None:
     v.add_argument("--out", type=Path, required=True)
     v.add_argument("--label", default="prediction")
 
+    pr = sub.add_parser("predictability", help="re-simulate episodes under small perturbations")
+    pr.add_argument("--data", type=Path, required=True)
+    pr.add_argument("--out", type=Path, required=True, help="per-episode results (jsonl)")
+    pr.add_argument("--runs", type=int, default=50)
+    pr.add_argument("--workers", type=int, default=16)
+
     b = sub.add_parser("baseline", help="write baseline predictions")
     b.add_argument("--data", type=Path, required=True)
     b.add_argument("--name", required=True, choices=[*baselines.OUTCOME_BASELINES, *baselines.ROLLOUT_BASELINES, "oracle"])
@@ -60,6 +66,12 @@ def main() -> None:
 
         pred = next(args.pred / f"{args.ep}{e}" for e in (".mp4", ".gif", ".npy") if (args.pred / f"{args.ep}{e}").exists())
         print(json.dumps(compare_video(args.data, pred, args.ep, args.out, args.label)))
+    elif args.cmd == "predictability":
+        from .angry_birds import predictability
+
+        summary = predictability.analyze(args.data, args.out, args.runs, args.workers)
+        summary["runs_per_condition"] = args.runs
+        print(json.dumps(summary, indent=2))
     elif args.cmd == "baseline":
         if args.name in baselines.OUTCOME_BASELINES:
             baselines.run_outcome_baseline(args.name, args.data, args.out)
