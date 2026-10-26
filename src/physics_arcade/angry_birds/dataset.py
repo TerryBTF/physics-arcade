@@ -22,6 +22,7 @@ import numpy as np
 from PIL import Image
 
 from .episode import CONTEXT_FRAMES, TOTAL_FRAMES, generate_episode
+from .predictability import CONDITIONS, LABEL_CONDITION, LABEL_RUNS, pig_survival
 from .render import CLASSES, PALETTE, segment
 from .sim import FPS, HEIGHT, WIDTH
 
@@ -65,6 +66,10 @@ def _write_one(args: tuple[int, str, str]) -> dict:
         "first_contact_time": ep.first_contact_time,
         "attempt": ep.attempt,
         "launch": {"speed": ep.speed, "angle_deg": ep.angle},
+        # Outcome-track labels: survival probability of each pig over perturbed replays.
+        # `pigs_alive` above is the single recorded run shown in the video.
+        "p_alive": {str(k): v for k, v in pig_survival(seed, ep.attempt, sorted(ep.pigs_initial)).items()},
+        "label": {"condition": LABEL_CONDITION, "runs": LABEL_RUNS, "noise": CONDITIONS[LABEL_CONDITION]},
     }
     (ans / f"{eid}.json").write_text(json.dumps(answer, indent=1))
 

@@ -63,6 +63,7 @@ def _episode(args: tuple[str, int, int, list[int], list[int], int]) -> dict:
             # per pig: probability its fate matches the recorded one
             "pig_agreement": {str(p): (p_alive[p] if p in gt else 1 - p_alive[p]) for p in pig_ids},
             "majority_alive": sorted(p for p in pig_ids if p_alive[p] > 0.5),
+            "p_alive": {str(p): v for p, v in p_alive.items()},
         }
     return out
 
@@ -105,4 +106,22 @@ def write_majority_predictions(results_path: Path, condition: str, out_path: Pat
     with open(results_path) as src, open(out_path, "w") as dst:
         for line in src:
             r = json.loads(line)
-            dst.write(json.dumps({"id": r["id"], "pigs_alive": r["conditions"][condition]["majority_alive"]}) + "\n")
+            c = r["conditions"][condition]
+            dst.write(json.dumps({"id": r["id"], "pigs_alive": c["majority_alive"], "p_alive": c["p_alive"]}) + "\n")
+
+
+# Outcome-track labels: each pig's probability of surviving when the episode is
+# replayed under perturbations at the precision a careful 12-frame estimate can reach.
+LABEL_CONDITION = "launch_tiny"
+LABEL_RUNS = 50
+
+
+def pig_survival(seed: int, attempt: int, pig_ids: list[int], runs: int = LABEL_RUNS) -> dict[int, float]:
+    cond = CONDITIONS[LABEL_CONDITION]
+    rng = random.Random(f"label-{seed}")
+    counts = dict.fromkeys(pig_ids, 0)
+    for _ in range(runs):
+        alive, _ = _run(seed, attempt, cond, rng)
+        for p in alive:
+            counts[p] += 1
+    return {p: c / runs for p, c in counts.items()}

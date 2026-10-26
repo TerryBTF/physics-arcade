@@ -11,8 +11,15 @@ before any contact, and has to predict what happens next.
 
 | Track | Model output | Metric |
 |---|---|---|
-| **Outcome** | which pig ids are still alive once everything is at rest (`jsonl`) | per-pig balanced accuracy, episode exact match, alive-count MAE |
-| **Rollout** | the remaining 5.6 s of video (`mp4`, 640×360, 30 fps) | mean IoU of dynamic classes (bird, pig, wood, stone, ice) against simulator masks, final pig-count accuracy |
+| **Outcome** | which pig ids are still alive once everything is at rest, optionally with probabilities (`jsonl`) | balanced accuracy on stable pigs (headline), Brier score on all pigs |
+| **Rollout** | the remaining 5.6 s of video (`mp4`, 640×360, 30 fps) | mean IoU of dynamic classes (bird, pig, wood, stone, ice) against simulator masks, ±1 frame time tolerance; final pig-count accuracy |
+
+Collisions are chaotic (see [Predictability](#predictability)), so outcome labels are
+each pig's survival probability over 50 replays with tiny launch perturbations. A pig is
+*stable* when its fate agrees in ≥ 90 % of replays (83 % of pigs); balanced accuracy is
+computed on stable pigs against the majority fate. The Brier score is the expected
+squared error against an outcome drawn from the replays; its floor (perfect
+probabilities) is 0.037.
 
 Rollout videos are scored automatically: predicted frames are segmented into object
 classes by color and compared with ground-truth masks rendered by the simulator.
@@ -44,12 +51,24 @@ frame with pig ids) are what a model may see; `answers/` holds the hidden ground
 
 ## Reference results (200 episodes)
 
-| Track | Method | flat | cartoon |
-|---|---|---|---|
-| Outcome | all alive / all dead | 0.50 | 0.50 |
-| Outcome | ballistic path only (ignores collapses) | 0.63 | 0.63 |
-| Rollout | ground-truth video (upper bound) | mIoU 0.95 | mIoU 0.93 |
-| Rollout | freeze last context frame | mIoU 0.41 | mIoU 0.41 |
+Outcome track (identical for both styles):
+
+| Method | stable-pig bal. acc. | Brier ↓ |
+|---|---|---|
+| all alive / all dead | 0.50 | 0.50 |
+| ballistic path only (ignores collapses) | 0.66 | 0.37 |
+| simulator with exact scene, launch noise 1 % / 0.5° (reference) | 1.00 | 0.047 |
+
+Rollout track (mIoU):
+
+| Method | flat | cartoon |
+|---|---|---|
+| ground-truth video (upper bound) | 0.95 | 0.93 |
+| ground truth resampled through the 16 fps Cosmos path (`models/cosmos/dry_run.py`) | 0.89 | 0.85 |
+| freeze last context frame | 0.41 | 0.41 |
+
+16 fps models lose ~0.06 mIoU to temporal sampling alone, mostly on the fast-moving
+bird; the dry-run row above is their practical ceiling.
 
 ## Predictability
 
@@ -57,9 +76,7 @@ frame with pig ids) are what a model may see; `answers/` holds the hidden ground
 pre-launch scene under small perturbations and records how often each pig's fate
 matches the recorded one. Collisions are chaotic: with launch noise of only 0.25 %
 speed / 0.1°, 35 % of episodes keep the same outcome in every run and 16 % of pigs
-flip in 10–90 % of runs. The per-pig majority vote of a perfect simulator fed a
-realistic launch estimate (1 % / 0.5°) reaches 0.94 balanced accuracy, a practical
-ceiling for the outcome track.
+flip in 10–90 % of runs. These replays define the outcome-track labels.
 
 ## Models
 
