@@ -59,19 +59,20 @@ def compare_video(data_dir: Path, pred_path: Path, eid: str, out_path: Path, mod
     gt_masks = np.load(data_dir / "answers" / f"{eid}_masks.npz")["masks"]
     pred = _align(load_video(pred_path), n_future, n_total)
     fps = manifest.get("fps", 30)
+    style = manifest.get("style", "flat")
 
     frames, mious = [], []
     for t in range(n_total):
         gt_rgb = gt_video[t]
         if t < n_ctx:
             pred_rgb = gt_rgb
-            gt_seg = pred_seg = segment(gt_rgb)
+            gt_seg = pred_seg = segment(gt_rgb, style)
             err = _colorize(pred_seg)
             status = f"{eid} | frame {t:3d}/{n_total} | CONTEXT (given to the model)"
         else:
             f = t - n_ctx
             pred_rgb = pred[f]
-            gt_seg, pred_seg = gt_masks[f], segment(pred_rgb)
+            gt_seg, pred_seg = gt_masks[f], segment(pred_rgb, style)
             err = _error_view(pred_seg, gt_seg)
             m = _mean(_class_ious(_inter_union(pred_seg, gt_seg)))
             mious.append(m)

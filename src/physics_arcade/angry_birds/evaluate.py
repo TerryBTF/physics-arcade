@@ -115,8 +115,8 @@ def count_pigs(mask: np.ndarray) -> int:
     return int((areas >= MIN_PIG_AREA).sum())
 
 
-def _score_episode(args: tuple[Path, Path, str, int, int]) -> dict | None:
-    data_dir, pred_dir, eid, n_future, n_total = args
+def _score_episode(args: tuple[Path, Path, str, int, int, str]) -> dict | None:
+    data_dir, pred_dir, eid, n_future, n_total, style = args
     cands = [pred_dir / f"{eid}{ext}" for ext in (".mp4", ".gif", ".npy")]
     path = next((p for p in cands if p.exists()), None)
     if path is None:
@@ -126,8 +126,8 @@ def _score_episode(args: tuple[Path, Path, str, int, int]) -> dict | None:
     if frames.shape[1:3] != gt.shape[1:3]:
         raise ValueError(f"{path}: frame size {frames.shape[1:3]} != {gt.shape[1:3]}")
     # IoU accumulated over all future frames, so a frame where a class is tiny cannot dominate.
-    iu = sum(_inter_union(segment(frames[t]), gt[t]) for t in range(n_future))
-    final_pred = segment(frames[-1])
+    iu = sum(_inter_union(segment(frames[t], style), gt[t]) for t in range(n_future))
+    final_pred = segment(frames[-1], style)
     return {
         "ious": _class_ious(iu),
         "final_ious": _class_ious(_inter_union(final_pred, gt[-1])),
@@ -140,7 +140,8 @@ def eval_rollout(data_dir: Path, pred_dir: Path, workers: int = 8) -> dict:
     n_total, n_ctx = manifest["total_frames"], manifest["context_frames"]
     n_future = n_total - n_ctx
     answers = _load_answers(data_dir)
-    jobs = [(data_dir, pred_dir, eid, n_future, n_total) for eid in answers]
+    style = manifest.get("style", "flat")
+    jobs = [(data_dir, pred_dir, eid, n_future, n_total, style) for eid in answers]
     with ProcessPoolExecutor(max_workers=workers) as pool:
         results = list(pool.map(_score_episode, jobs, chunksize=4))
     per_class: dict[str, list[float]] = {c: [] for c in DYNAMIC_CLASSES}

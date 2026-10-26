@@ -9,6 +9,7 @@ from dataclasses import dataclass
 import numpy as np
 from PIL import Image
 
+from .cartoon import render_cartoon
 from .levels import generate_level
 from .render import label_pigs, render
 from .sim import (
@@ -35,7 +36,8 @@ class Episode:
     seed: int
     speed: float
     angle: float
-    frames: list[np.ndarray]
+    frames: list[np.ndarray]  # flat style; the source of ground-truth class masks
+    display_frames: list[np.ndarray]  # what the model sees (same as `frames` for the flat style)
     labeled_first_frame: Image.Image
     pigs_initial: dict[int, tuple[float, float, float]]  # id -> (x, y, r)
     pigs_alive: list[int]
@@ -73,7 +75,7 @@ def _choose_launch(world: World, rng: random.Random) -> tuple[float, float] | No
     return None
 
 
-def generate_episode(seed: int, max_tries: int = 50) -> Episode:
+def generate_episode(seed: int, style: str = "flat", max_tries: int = 50) -> Episode:
     """Deterministically generate an episode from a seed (retrying internally on rejects)."""
     rng = random.Random(seed)
     for _ in range(max_tries):
@@ -94,13 +96,16 @@ def generate_episode(seed: int, max_tries: int = 50) -> Episode:
         world.time = 0.0
         world.damage_enabled = True
         launch_bird(world, speed, angle)
+        styled = style != "flat"
         first = render(world)
-        labeled = label_pigs(first, world)
-        frames = [np.asarray(first)]
+        first_display = render_cartoon(world) if styled else first
+        labeled = label_pigs(first_display, world)
+        frames, display = [np.asarray(first)], [np.asarray(first_display)]
         for _ in range(TOTAL_FRAMES - 1):
             for _ in range(STEPS_PER_FRAME):
                 step(world)
             frames.append(np.asarray(render(world)))
+            display.append(np.asarray(render_cartoon(world)) if styled else frames[-1])
 
         # Bird must still be in free flight for the whole context window.
         ctx_t = CONTEXT_FRAMES / FPS
@@ -113,6 +118,7 @@ def generate_episode(seed: int, max_tries: int = 50) -> Episode:
             speed=speed,
             angle=angle,
             frames=frames,
+            display_frames=display,
             labeled_first_frame=labeled,
             pigs_initial=pigs_initial,
             pigs_alive=sorted(p.pig_id for p in world.pigs if p.alive),

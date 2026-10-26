@@ -18,6 +18,9 @@ def main() -> None:
     g.add_argument("--n", type=int, default=200)
     g.add_argument("--seed-offset", type=int, default=0)
     g.add_argument("--workers", type=int, default=8)
+    g.add_argument("--style", choices=dataset.STYLES, default="flat")
+
+    sub.add_parser("fit-cartoon-lut", help="refit the color table used to segment cartoon-style frames")
 
     eo = sub.add_parser("eval-outcome", help="score pig-survival predictions (jsonl)")
     eo.add_argument("--data", type=Path, required=True)
@@ -42,8 +45,12 @@ def main() -> None:
 
     args = ap.parse_args()
     if args.cmd == "generate":
-        dataset.write_dataset(args.out, args.n, args.seed_offset, args.workers)
+        dataset.write_dataset(args.out, args.n, args.seed_offset, args.workers, args.style)
         print(f"wrote {args.n} episodes to {args.out}")
+    elif args.cmd == "fit-cartoon-lut":
+        from .angry_birds.cartoon import build_lut
+
+        print(json.dumps(build_lut(), indent=2))
     elif args.cmd == "eval-outcome":
         print(json.dumps(evaluate.eval_outcome(args.data, args.pred), indent=2))
     elif args.cmd == "eval-rollout":

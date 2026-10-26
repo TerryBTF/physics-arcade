@@ -65,10 +65,20 @@ def label_pigs(img: Image.Image, world: World) -> Image.Image:
     return img
 
 
-def segment(frame: np.ndarray) -> np.ndarray:
-    """Map an RGB frame (H, W, 3) to class indices (H, W) by nearest palette color."""
+def segment(frame: np.ndarray, style: str = "flat") -> np.ndarray:
+    """Map an RGB frame (H, W, 3) to class indices (H, W).
+
+    Flat frames use the nearest palette color; cartoon frames use a color table
+    fitted on rendered episodes (see cartoon.fit_lut).
+    """
+    if style == "flat":
+        lut = _LUT
+    else:
+        from .cartoon import cartoon_lut
+
+        lut = cartoon_lut()
     f = frame[..., :3] >> 2
-    return _LUT[(f[..., 0].astype(np.int32) << 12) | (f[..., 1].astype(np.int32) << 6) | f[..., 2]]
+    return lut[(f[..., 0].astype(np.int32) << 12) | (f[..., 1].astype(np.int32) << 6) | f[..., 2]]
 
 
 def _build_lut() -> np.ndarray:

@@ -26,6 +26,7 @@ from .render import CLASSES, PALETTE, segment
 from .sim import FPS, HEIGHT, WIDTH
 
 VERSION = "angry_birds-v0"
+STYLES = ("flat", "cartoon")
 
 QUESTION = (
     "A bird has just been launched from the slingshot on the left. The images show the first "
@@ -38,23 +39,23 @@ def episode_id(seed: int) -> str:
     return f"ep_{seed:05d}"
 
 
-def _write_one(args: tuple[int, str]) -> dict:
-    seed, out = args
+def _write_one(args: tuple[int, str, str]) -> dict:
+    seed, out, style = args
     out_dir = Path(out)
-    ep = generate_episode(seed)
+    ep = generate_episode(seed, style)
     eid = episode_id(seed)
     inp = out_dir / "inputs" / eid
     inp.mkdir(parents=True, exist_ok=True)
     for i in range(CONTEXT_FRAMES):
-        Image.fromarray(ep.frames[i]).save(inp / f"context_{i:02d}.png")
-    iio.imwrite(inp / "context.mp4", np.stack(ep.frames[:CONTEXT_FRAMES]), fps=FPS, codec="libx264", quality=9, macro_block_size=1)
+        Image.fromarray(ep.display_frames[i]).save(inp / f"context_{i:02d}.png")
+    iio.imwrite(inp / "context.mp4", np.stack(ep.display_frames[:CONTEXT_FRAMES]), fps=FPS, codec="libx264", quality=9, macro_block_size=1)
     ep.labeled_first_frame.save(inp / "labeled.png")
 
     ans = out_dir / "answers"
     ans.mkdir(parents=True, exist_ok=True)
     masks = np.stack([segment(f) for f in ep.frames[CONTEXT_FRAMES:]]).astype(np.uint8)
     np.savez_compressed(ans / f"{eid}_masks.npz", masks=masks)
-    iio.imwrite(ans / f"{eid}.mp4", np.stack(ep.frames), fps=FPS, codec="libx264", quality=9, macro_block_size=1)
+    iio.imwrite(ans / f"{eid}.mp4", np.stack(ep.display_frames), fps=FPS, codec="libx264", quality=9, macro_block_size=1)
     answer = {
         "id": eid,
         "pigs_alive": ep.pigs_alive,
@@ -79,9 +80,9 @@ def _write_one(args: tuple[int, str]) -> dict:
     }
 
 
-def write_dataset(out_dir: Path, n: int, seed_offset: int = 0, workers: int = 8) -> None:
+def write_dataset(out_dir: Path, n: int, seed_offset: int = 0, workers: int = 8, style: str = "flat") -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
-    jobs = [(seed_offset + i, str(out_dir)) for i in range(n)]
+    jobs = [(seed_offset + i, str(out_dir), style) for i in range(n)]
     with ProcessPoolExecutor(max_workers=workers) as pool:
         tasks = list(pool.map(_write_one, jobs, chunksize=4))
     with open(out_dir / "tasks.jsonl", "w") as f:
@@ -89,6 +90,7 @@ def write_dataset(out_dir: Path, n: int, seed_offset: int = 0, workers: int = 8)
             f.write(json.dumps(t) + "\n")
     manifest = {
         "version": VERSION,
+        "style": style,
         "num_episodes": n,
         "fps": FPS,
         "width": WIDTH,
