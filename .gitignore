@@ -3,3 +3,4 @@ preds/
 .venv/
 __pycache__/
 viz/
+models/*/.venv/
