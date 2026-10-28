@@ -78,7 +78,12 @@ def main() -> None:
     # The repo also holds six native-format .pt checkpoints (~24 GB) that diffusers does not use.
     path = snapshot_download(MODEL_ID, ignore_patterns=["*.pt"])
     pipe = Cosmos2VideoToWorldPipeline.from_pretrained(path, torch_dtype=torch.bfloat16)
+    # CosmosSafetyChecker.to() returns None, which breaks accelerate's offload hook. The
+    # pipeline moves the safety checker to the GPU and back around each use on its own,
+    # so it is left out of the automatic offload (it still runs on every prompt and video).
+    pipe._exclude_from_cpu_offload = ["safety_checker"]
     pipe.enable_model_cpu_offload()  # T5-XXL + DiT + VAE do not fit in 16 GB together
+    pipe.safety_checker.to("cpu")
 
     cidx = cond_indices(n_ctx)
     log = []
