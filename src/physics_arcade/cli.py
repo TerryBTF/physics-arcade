@@ -6,15 +6,15 @@ import argparse
 import json
 from pathlib import Path
 
-from .angry_birds import baselines, dataset, evaluate
+from .slingshot import baselines, dataset, evaluate
 
 
 def main() -> None:
     ap = argparse.ArgumentParser(prog="physics-arcade")
     sub = ap.add_subparsers(dest="cmd", required=True)
 
-    g = sub.add_parser("generate", help="generate an Angry Birds dataset")
-    g.add_argument("--out", type=Path, default=Path("data/angry_birds_v0"))
+    g = sub.add_parser("generate", help="generate a Slingshot dataset")
+    g.add_argument("--out", type=Path, default=Path("data/slingshot_v0"))
     g.add_argument("--n", type=int, default=200)
     g.add_argument("--seed-offset", type=int, default=0)
     g.add_argument("--workers", type=int, default=8)
@@ -54,7 +54,7 @@ def main() -> None:
         dataset.write_dataset(args.out, args.n, args.seed_offset, args.workers, args.style)
         print(f"wrote {args.n} episodes to {args.out}")
     elif args.cmd == "fit-cartoon-lut":
-        from .angry_birds.cartoon import build_lut
+        from .slingshot.cartoon import build_lut
 
         print(json.dumps(build_lut(), indent=2))
     elif args.cmd == "eval-outcome":
@@ -62,12 +62,12 @@ def main() -> None:
     elif args.cmd == "eval-rollout":
         print(json.dumps(evaluate.eval_rollout(args.data, args.pred, args.workers), indent=2))
     elif args.cmd == "visualize":
-        from .angry_birds.visualize import compare_video
+        from .slingshot.visualize import compare_video
 
         pred = next(args.pred / f"{args.ep}{e}" for e in (".mp4", ".gif", ".npy") if (args.pred / f"{args.ep}{e}").exists())
         print(json.dumps(compare_video(args.data, pred, args.ep, args.out, args.label)))
     elif args.cmd == "predictability":
-        from .angry_birds import predictability
+        from .slingshot import predictability
 
         summary = predictability.analyze(args.data, args.out, args.runs, args.workers)
         summary["runs_per_condition"] = args.runs

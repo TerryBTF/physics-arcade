@@ -2,7 +2,7 @@
 
 Classic physics games as benchmarks for physical prediction in world models and VLMs.
 
-The first game is an Angry Birds–style level: a bird is launched at towers of wood,
+The first game is **Slingshot**: a bird is launched from a slingshot at towers of wood,
 stone and ice blocks with pigs on and between them (2D rigid-body physics via
 [pymunk](https://www.pymunk.org)). A model sees the first 0.4 s of the bird's flight,
 before any contact, and has to predict what happens next.
@@ -37,7 +37,7 @@ difference isolates the effect of visual style.
 
 ```bash
 uv sync
-D=data/angry_birds_v0
+D=data/slingshot_v0
 uv run physics-arcade generate --n 200 --out $D            # add --style cartoon for the textured version
 uv run physics-arcade baseline --data $D --name ballistic --out preds/ballistic.jsonl
 uv run physics-arcade eval-outcome --data $D --pred preds/ballistic.jsonl
@@ -87,5 +87,5 @@ login with access to the gated `nvidia/Cosmos-Predict2-2B-Video2World`,
 
 ```bash
 cd models/cosmos && ./setup.sh
-.venv/bin/python run_cosmos.py --data ../../data/angry_birds_v0 --out ../../preds/rollout_cosmos2b --limit 10
+.venv/bin/python run_cosmos.py --data ../../data/slingshot_v0 --out ../../preds/rollout_cosmos2b --limit 10
 ```

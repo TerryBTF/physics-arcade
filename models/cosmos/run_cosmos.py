@@ -15,7 +15,7 @@ the final generated frame.
 Usage (on robotpc):
     cd ~/Benchmark/models/cosmos
     umask 022   # NLTK (used by the guardrail) refuses group-writable data directories
-    .venv/bin/python run_cosmos.py --data ../../data/angry_birds_v0 \
+    .venv/bin/python run_cosmos.py --data ../../data/slingshot_v0 \
         --out ../../preds/rollout_cosmos2b --limit 10
 """
 

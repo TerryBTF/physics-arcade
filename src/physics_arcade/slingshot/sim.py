@@ -1,4 +1,4 @@
-"""2D Angry-Birds-style physics simulation built on pymunk.
+"""2D slingshot physics simulation built on pymunk.
 
 Coordinates are in pixels with y pointing up; the renderer flips them.
 """

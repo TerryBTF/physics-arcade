@@ -26,7 +26,7 @@ from .predictability import CONDITIONS, LABEL_CONDITION, LABEL_RUNS, pig_surviva
 from .render import CLASSES, PALETTE, segment
 from .sim import FPS, HEIGHT, WIDTH
 
-VERSION = "angry_birds-v0"
+VERSION = "slingshot-v0"
 STYLES = ("flat", "cartoon")
 
 QUESTION = (

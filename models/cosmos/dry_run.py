@@ -6,7 +6,7 @@ resolution. It then goes through the same conversion as run_cosmos.py
 (timing.to_benchmark_frames). Scoring the result shows how much the resampling
 alone costs; it should sit just below the oracle.
 
-    uv run python models/cosmos/dry_run.py --data data/angry_birds_v0 --out preds/cosmos_dryrun
+    uv run python models/cosmos/dry_run.py --data data/slingshot_v0 --out preds/cosmos_dryrun
 """
 
 from __future__ import annotations
