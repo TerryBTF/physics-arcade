@@ -44,6 +44,10 @@ def main() -> None:
     pr.add_argument("--runs", type=int, default=50)
     pr.add_argument("--workers", type=int, default=16)
 
+    lb = sub.add_parser("leaderboard", help="Markdown table for several outcome prediction files")
+    lb.add_argument("--data", type=Path, required=True)
+    lb.add_argument("entries", nargs="+", help="NAME=path/to/predictions.jsonl")
+
     b = sub.add_parser("baseline", help="write baseline predictions")
     b.add_argument("--data", type=Path, required=True)
     b.add_argument("--name", required=True, choices=[*baselines.OUTCOME_BASELINES, *baselines.ROLLOUT_BASELINES, "oracle"])
@@ -72,6 +76,11 @@ def main() -> None:
         summary = predictability.analyze(args.data, args.out, args.runs, args.workers)
         summary["runs_per_condition"] = args.runs
         print(json.dumps(summary, indent=2))
+    elif args.cmd == "leaderboard":
+        from .leaderboard import outcome_table
+
+        entries = [(e.split("=", 1)[0], Path(e.split("=", 1)[1])) for e in args.entries]
+        print(outcome_table(args.data, entries))
     elif args.cmd == "baseline":
         if args.name in baselines.OUTCOME_BASELINES:
             baselines.run_outcome_baseline(args.name, args.data, args.out)
