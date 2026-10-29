@@ -3,7 +3,7 @@
 Layout (each panel 640x360):
     ground-truth video     | predicted video
     ground-truth classes   | predicted classes, errors in magenta
-with a header showing the frame index, that frame's mIoU, and live pig counts.
+with a header showing the frame index, that frame's mIoU, and live robot counts.
 """
 
 from __future__ import annotations
@@ -15,7 +15,7 @@ import imageio.v3 as iio
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
-from .evaluate import _align, _class_ious, _inter_union, _mean, count_pigs, load_video
+from .evaluate import _align, _class_ious, _inter_union, _mean, count_robots, load_video
 from .render import CLASSES, DYNAMIC_CLASSES, PALETTE, segment
 
 HEADER = 28
@@ -78,7 +78,7 @@ def compare_video(data_dir: Path, pred_path: Path, eid: str, out_path: Path, mod
             mious.append(m)
             status = (
                 f"{eid} | frame {t:3d}/{n_total} | mIoU {m:.2f} | "
-                f"pigs  GT {count_pigs(gt_seg)}  pred {count_pigs(pred_seg)}"
+                f"robots  GT {count_robots(gt_seg)}  pred {count_robots(pred_seg)}"
             )
         top = np.concatenate([_label(gt_rgb, "ground truth"), _label(pred_rgb, model_name)], axis=1)
         bottom = np.concatenate(

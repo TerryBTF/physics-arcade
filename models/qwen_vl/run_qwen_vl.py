@@ -4,7 +4,7 @@ Runs in models/qwen_vl/.venv (see setup.sh). Prompting and answer parsing live i
 physics_arcade.vlm so every backend sees exactly the same task.
 
     cd ~/Benchmark/models/qwen_vl
-    .venv/bin/python run_qwen_vl.py --data ../../data/slingshot_v0 --out ../../preds/qwen3vl_4b.jsonl
+    .venv/bin/python run_qwen_vl.py --data ../../data/catapult_v0 --out ../../preds/qwen3vl_4b.jsonl
 """
 
 from __future__ import annotations

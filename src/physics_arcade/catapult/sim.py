@@ -1,4 +1,4 @@
-"""2D slingshot physics simulation built on pymunk.
+"""2D catapult physics simulation built on pymunk.
 
 Coordinates are in pixels with y pointing up; the renderer flips them.
 """
@@ -13,20 +13,22 @@ import pymunk
 WIDTH, HEIGHT = 640, 360
 GROUND_Y = 40.0
 GRAVITY = 500.0
-SLING_POS = (100.0, 110.0)
+LAUNCH_POS = (100.0, 110.0)
 DT = 1.0 / 120.0
 FPS = 30
 STEPS_PER_FRAME = int(round(1.0 / (DT * FPS)))
 
-BIRD_RADIUS = 8.0
+BALL_RADIUS = 8.0
 
 # density, friction, elasticity, health
 MATERIALS = {
     "wood": (1.0, 0.7, 0.1, 160.0),
     "stone": (2.5, 0.8, 0.05, 450.0),
     "ice": (0.8, 0.3, 0.1, 60.0),
-    "pig": (0.8, 0.6, 0.2, 40.0),
-    "bird": (4.0, 0.6, 0.2, math.inf),
+    # Robots are squares; density is scaled by pi/4 so a robot of half-size r has the
+    # mass of the circular target of radius r used before.
+    "robot": (0.8 * math.pi / 4, 0.6, 0.2, 40.0),
+    "ball": (4.0, 0.6, 0.2, math.inf),
 }
 # Impulse units that remove one health point.
 DAMAGE_SCALE = 400.0
@@ -36,12 +38,12 @@ DAMAGE_THRESHOLD = 2500.0
 
 @dataclass
 class Obj:
-    """One dynamic object. `kind` is a material name; `pig_id` is set for pigs."""
+    """One dynamic object. `kind` is a material name; `robot_id` is set for robots."""
 
     kind: str
     shape: pymunk.Shape
     health: float
-    pig_id: int | None = None
+    robot_id: int | None = None
     size: tuple[float, float] | None = None  # (w, h) for blocks, (r, r) for circles
     alive: bool = True
 
@@ -55,7 +57,7 @@ class World:
     space: pymunk.Space
     objects: list[Obj] = field(default_factory=list)
     damage_enabled: bool = False
-    bird: Obj | None = None
+    ball: Obj | None = None
     first_contact_time: float | None = None
     time: float = 0.0
 
@@ -78,8 +80,8 @@ class World:
         self.space.remove(obj.body, obj.shape)
 
     @property
-    def pigs(self) -> list[Obj]:
-        return [o for o in self.objects if o.kind == "pig"]
+    def robots(self) -> list[Obj]:
+        return [o for o in self.objects if o.kind == "robot"]
 
 
 def new_world() -> World:
@@ -97,7 +99,7 @@ def new_world() -> World:
         if not arbiter.is_first_contact:
             return
         objs = [world.by_shape(s) for s in arbiter.shapes]
-        if world.bird is not None and world.first_contact_time is None and any(o is world.bird for o in objs):
+        if world.ball is not None and world.first_contact_time is None and any(o is world.ball for o in objs):
             world.first_contact_time = world.time
         if not world.damage_enabled:
             return
@@ -125,29 +127,30 @@ def add_block(world: World, material: str, x: float, y: float, w: float, h: floa
     return world.add(Obj(kind=material, shape=shape, health=health, size=(w, h)))
 
 
-def add_pig(world: World, pig_id: int, x: float, y: float, r: float) -> Obj:
-    density, friction, elasticity, health = MATERIALS["pig"]
+def add_robot(world: World, robot_id: int, x: float, y: float, r: float) -> Obj:
+    """A square robot with half-size r (side 2r) centred at (x, y)."""
+    density, friction, elasticity, health = MATERIALS["robot"]
     body = pymunk.Body()
     body.position = (x, y)
-    shape = pymunk.Circle(body, r)
+    shape = pymunk.Poly.create_box(body, (2 * r, 2 * r), radius=0.0)
     shape.density = density
     shape.friction = friction
     shape.elasticity = elasticity
-    return world.add(Obj(kind="pig", shape=shape, health=health, pig_id=pig_id, size=(r, r)))
+    return world.add(Obj(kind="robot", shape=shape, health=health, robot_id=robot_id, size=(2 * r, 2 * r)))
 
 
-def launch_bird(world: World, speed: float, angle_deg: float) -> Obj:
-    density, friction, elasticity, health = MATERIALS["bird"]
+def launch_ball(world: World, speed: float, angle_deg: float) -> Obj:
+    density, friction, elasticity, health = MATERIALS["ball"]
     body = pymunk.Body()
-    body.position = SLING_POS
+    body.position = LAUNCH_POS
     a = math.radians(angle_deg)
     body.velocity = (speed * math.cos(a), speed * math.sin(a))
-    shape = pymunk.Circle(body, BIRD_RADIUS)
+    shape = pymunk.Circle(body, BALL_RADIUS)
     shape.density = density
     shape.friction = friction
     shape.elasticity = elasticity
-    world.bird = world.add(Obj(kind="bird", shape=shape, health=health, size=(BIRD_RADIUS, BIRD_RADIUS)))
-    return world.bird
+    world.ball = world.add(Obj(kind="ball", shape=shape, health=health, size=(BALL_RADIUS, BALL_RADIUS)))
+    return world.ball
 
 
 def step(world: World) -> None:
@@ -186,7 +189,7 @@ def ballistic_y(x: float, speed: float, angle_deg: float) -> float | None:
     vx, vy = speed * math.cos(a), speed * math.sin(a)
     if vx <= 0:
         return None
-    t = (x - SLING_POS[0]) / vx
+    t = (x - LAUNCH_POS[0]) / vx
     if t < 0:
         return None
-    return SLING_POS[1] + vy * t - 0.5 * GRAVITY * t * t
+    return LAUNCH_POS[1] + vy * t - 0.5 * GRAVITY * t * t

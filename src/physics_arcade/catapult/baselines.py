@@ -8,7 +8,7 @@ from pathlib import Path
 import imageio.v3 as iio
 import numpy as np
 
-from .sim import BIRD_RADIUS, ballistic_y
+from .sim import BALL_RADIUS, ballistic_y
 
 
 def _tasks(data_dir: Path) -> list[dict]:
@@ -16,22 +16,22 @@ def _tasks(data_dir: Path) -> list[dict]:
 
 
 def _ballistic_hits(task: dict) -> set[int]:
-    """Pigs that the unobstructed parabola passes through (ignores blocks and collapses)."""
+    """Robots that the unobstructed parabola passes through (ignores blocks and collapses)."""
     speed, angle = task["launch"]["speed"], task["launch"]["angle_deg"]
     hit = set()
-    for pid, p in task["pigs"].items():
+    for pid, p in task["robots"].items():
         for dx in np.linspace(-p["r"], p["r"], 9):
             y = ballistic_y(p["x"] + dx, speed, angle)
-            if y is not None and abs(y - p["y"]) <= p["r"] + BIRD_RADIUS:
+            if y is not None and abs(y - p["y"]) <= p["r"] + BALL_RADIUS:
                 hit.add(int(pid))
                 break
     return hit
 
 
 OUTCOME_BASELINES = {
-    "all_alive": lambda t: t["pig_ids"],
+    "all_alive": lambda t: t["robot_ids"],
     "none_alive": lambda t: [],
-    "ballistic": lambda t: sorted(set(t["pig_ids"]) - _ballistic_hits(t)),
+    "ballistic": lambda t: sorted(set(t["robot_ids"]) - _ballistic_hits(t)),
 }
 
 
@@ -40,7 +40,7 @@ def run_outcome_baseline(name: str, data_dir: Path, out_path: Path) -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with open(out_path, "w") as f:
         for t in _tasks(data_dir):
-            f.write(json.dumps({"id": t["id"], "pigs_alive": fn(t)}) + "\n")
+            f.write(json.dumps({"id": t["id"], "robots_alive": fn(t)}) + "\n")
 
 
 def _copy_last(data_dir: Path, task: dict) -> np.ndarray:
@@ -48,16 +48,16 @@ def _copy_last(data_dir: Path, task: dict) -> np.ndarray:
     return np.repeat(last[None], task["frames_to_predict"], axis=0)
 
 
-def _no_bird(data_dir: Path, task: dict) -> np.ndarray:
-    """Freeze the scene and remove the bird: "nothing happens"."""
+def _no_ball(data_dir: Path, task: dict) -> np.ndarray:
+    """Freeze the scene and remove the ball: "nothing happens"."""
     frames = _copy_last(data_dir, task)
     first = iio.imread(data_dir / task["context_frames"][0])[..., :3]
-    bird = np.all(frames[0] == (220, 30, 30), axis=-1)
-    frames[:, bird] = first[0, 0]  # top-left pixel is always sky
+    ball = np.all(frames[0] == (220, 30, 30), axis=-1)
+    frames[:, ball] = first[0, 0]  # top-left pixel is always sky
     return frames
 
 
-ROLLOUT_BASELINES = {"copy_last": _copy_last, "no_bird": _no_bird}
+ROLLOUT_BASELINES = {"copy_last": _copy_last, "no_ball": _no_ball}
 
 
 def run_rollout_baseline(name: str, data_dir: Path, out_dir: Path) -> None:

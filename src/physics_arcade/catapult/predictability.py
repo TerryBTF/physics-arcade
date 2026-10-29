@@ -22,7 +22,7 @@ from .episode import rollout, setup_for
 #   launch_tiny  speed 0.25 %, angle 0.1 deg: at or below the precision a careful estimate
 #                from 12 frames can reach; flips here mean the episode is chaotic.
 #   launch       speed 1 %, angle 0.5 deg: a realistic but imperfect visual estimate.
-#   scene        every block/pig shifted horizontally by 0.5 px, launch exact.
+#   scene        every block/robot shifted horizontally by 0.5 px, launch exact.
 CONDITIONS = {
     "launch_tiny": {"speed": 0.0025, "angle": 0.1, "pos": 0.0},
     "launch": {"speed": 0.01, "angle": 0.5, "pos": 0.0},
@@ -41,16 +41,16 @@ def _run(seed: int, attempt: int, cond: dict, rng: random.Random) -> tuple[list[
     speed = s.speed * (1 + rng.gauss(0, cond["speed"]))
     angle = s.angle + rng.gauss(0, cond["angle"])
     rollout(s.world, speed, angle, None)
-    return sorted(p.pig_id for p in s.world.pigs if p.alive), s.world.first_contact_time
+    return sorted(p.robot_id for p in s.world.robots if p.alive), s.world.first_contact_time
 
 
 def _episode(args: tuple[str, int, int, list[int], list[int], int]) -> dict:
-    eid, seed, attempt, pig_ids, gt_alive, runs = args
+    eid, seed, attempt, robot_ids, gt_alive, runs = args
     gt = set(gt_alive)
-    out = {"id": eid, "n_pigs": len(pig_ids), "conditions": {}}
+    out = {"id": eid, "n_robots": len(robot_ids), "conditions": {}}
     for name, cond in CONDITIONS.items():
         rng = random.Random(f"{seed}-{name}")
-        alive_counts = {p: 0 for p in pig_ids}
+        alive_counts = {p: 0 for p in robot_ids}
         same = 0
         for _ in range(runs):
             alive, _ = _run(seed, attempt, cond, rng)
@@ -60,9 +60,9 @@ def _episode(args: tuple[str, int, int, list[int], list[int], int]) -> dict:
         p_alive = {p: c / runs for p, c in alive_counts.items()}
         out["conditions"][name] = {
             "p_same_outcome": same / runs,
-            # per pig: probability its fate matches the recorded one
-            "pig_agreement": {str(p): (p_alive[p] if p in gt else 1 - p_alive[p]) for p in pig_ids},
-            "majority_alive": sorted(p for p in pig_ids if p_alive[p] > 0.5),
+            # per robot: probability its fate matches the recorded one
+            "robot_agreement": {str(p): (p_alive[p] if p in gt else 1 - p_alive[p]) for p in robot_ids},
+            "majority_alive": sorted(p for p in robot_ids if p_alive[p] > 0.5),
             "p_alive": {str(p): v for p, v in p_alive.items()},
         }
     return out
@@ -75,7 +75,7 @@ def analyze(data_dir: Path, out_path: Path, runs: int = 50, workers: int = 16) -
         ans = json.loads((data_dir / "answers" / f"{t['id']}.json").read_text())
         if "attempt" not in ans:
             raise ValueError(f"{data_dir} predates attempt tracking; regenerate it")
-        jobs.append((t["id"], t["seed"], ans["attempt"], ans["pig_ids"], ans["pigs_alive"], runs))
+        jobs.append((t["id"], t["seed"], ans["attempt"], ans["robot_ids"], ans["robots_alive"], runs))
     with ProcessPoolExecutor(max_workers=workers) as pool:
         results = list(pool.map(_episode, jobs, chunksize=2))
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -89,14 +89,14 @@ def summarize(results: list[dict]) -> dict:
     summary = {"episodes": len(results), "runs_per_condition": None}
     for name in CONDITIONS:
         ps = [r["conditions"][name]["p_same_outcome"] for r in results]
-        pig = [a for r in results for a in r["conditions"][name]["pig_agreement"].values()]
+        robot = [a for r in results for a in r["conditions"][name]["robot_agreement"].values()]
         summary[name] = {
             "mean_p_same_outcome": sum(ps) / len(ps),
             "episodes_fully_stable": sum(p == 1.0 for p in ps) / len(ps),
             "episodes_majority_matches": sum(p > 0.5 for p in ps) / len(ps),
             "episodes_coin_flip_or_worse": sum(p <= 0.5 for p in ps) / len(ps),
-            "pigs_stable_ge_90pct": sum(a >= 0.9 for a in pig) / len(pig),
-            "pigs_ambiguous_10_90": sum(0.1 < a < 0.9 for a in pig) / len(pig),
+            "robots_stable_ge_90pct": sum(a >= 0.9 for a in robot) / len(robot),
+            "robots_ambiguous_10_90": sum(0.1 < a < 0.9 for a in robot) / len(robot),
         }
     return summary
 
@@ -107,19 +107,19 @@ def write_majority_predictions(results_path: Path, condition: str, out_path: Pat
         for line in src:
             r = json.loads(line)
             c = r["conditions"][condition]
-            dst.write(json.dumps({"id": r["id"], "pigs_alive": c["majority_alive"], "p_alive": c["p_alive"]}) + "\n")
+            dst.write(json.dumps({"id": r["id"], "robots_alive": c["majority_alive"], "p_alive": c["p_alive"]}) + "\n")
 
 
-# Outcome-track labels: each pig's probability of surviving when the episode is
+# Outcome-track labels: each robot's probability of surviving when the episode is
 # replayed under perturbations at the precision a careful 12-frame estimate can reach.
 LABEL_CONDITION = "launch_tiny"
 LABEL_RUNS = 50
 
 
-def pig_survival(seed: int, attempt: int, pig_ids: list[int], runs: int = LABEL_RUNS) -> dict[int, float]:
+def robot_survival(seed: int, attempt: int, robot_ids: list[int], runs: int = LABEL_RUNS) -> dict[int, float]:
     cond = CONDITIONS[LABEL_CONDITION]
     rng = random.Random(f"label-{seed}")
-    counts = dict.fromkeys(pig_ids, 0)
+    counts = dict.fromkeys(robot_ids, 0)
     for _ in range(runs):
         alive, _ = _run(seed, attempt, cond, rng)
         for p in alive:

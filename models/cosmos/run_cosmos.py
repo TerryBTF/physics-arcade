@@ -15,7 +15,7 @@ the final generated frame.
 Usage (on robotpc):
     cd ~/Benchmark/models/cosmos
     umask 022   # NLTK (used by the guardrail) refuses group-writable data directories
-    .venv/bin/python run_cosmos.py --data ../../data/slingshot_v0 \
+    .venv/bin/python run_cosmos.py --data ../../data/catapult_v0 \
         --out ../../preds/rollout_cosmos2b --limit 10
 """
 
@@ -41,9 +41,9 @@ MODEL_ID = "nvidia/Cosmos-Predict2-2B-Video2World"
 OUT_W, OUT_H = 640, 360
 
 SCENE = (
-    "A small red bird has been launched from a slingshot on the left and flies along a ballistic arc toward "
-    "structures built from brown wood, gray stone and pale blue ice blocks, with round green pigs resting on "
-    "and between them. The bird hits the structures; blocks are pushed, topple and fall under gravity, and pigs "
+    "A dark teal cannonball has been fired from a catapult on the left and flies along a ballistic arc toward "
+    "structures built from brown wood, gray stone and pale blue ice blocks, with small square yellow robots resting "
+    "on and between them. The cannonball hits the structures; blocks are pushed, topple and fall under gravity, and robots "
     "that are struck hard or crushed disappear. Everything settles to rest on the ground. The camera never moves "
     "and no new objects appear."
 )
@@ -51,7 +51,7 @@ PROMPTS = {
     "flat": "A side-view 2D physics game rendered with flat solid colors, no shading and no text. " + SCENE
     + " The sky is plain light blue and the ground is plain green.",
     "cartoon": "A side-view 2D cartoon physics game with a blue sky, white clouds, hills and grass. " + SCENE
-    + " The pigs have simple cartoon faces; wood has grain, stone is speckled and ice is glossy.",
+    + " The robots have dark screen faces with glowing eyes and a short antenna; wood has grain, stone is speckled and ice is glossy.",
 }
 NEGATIVE_PROMPT = (
     "camera motion, zoom, panning, shaky footage, motion blur, 3D rendering, realistic textures, shading, "

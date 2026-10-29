@@ -1,10 +1,10 @@
 """Scoring for the two tracks.
 
-Outcome track: predictions.jsonl with {"id": ..., "pigs_alive": [ids]} and, optionally,
-"p_alive": {id: probability}. Collisions are chaotic, so labels are each pig's survival
+Outcome track: predictions.jsonl with {"id": ..., "robots_alive": [ids]} and, optionally,
+"p_alive": {id: probability}. Collisions are chaotic, so labels are each robot's survival
 probability over perturbed replays (answers/<id>.json "p_alive"). The headline metric
-is balanced accuracy on stable pigs, whose fate agrees in >= 90 % of replays; the
-Brier score covers every pig and rewards calibrated probabilities.
+is balanced accuracy on stable robots, whose fate agrees in >= 90 % of replays; the
+Brier score covers every robot and rewards calibrated probabilities.
 
 Rollout track: a directory of <id>.mp4 (or .gif / .npy) videos. A video may contain
 either only the future frames or the full clip including the context frames. Each
@@ -25,11 +25,11 @@ from scipy import ndimage
 
 from .render import CLASSES, DYNAMIC_CLASSES, segment
 
-MIN_PIG_AREA = 40  # px; smaller pig-colored blobs are treated as noise
+MIN_ROBOT_AREA = 40  # px; smaller robot-colored blobs are treated as noise
 # Predicted class masks are opened with this structuring element to drop isolated
 # pixels that video codecs create where two colors meet.
 OPEN = np.ones((3, 3), dtype=bool)
-STABLE = 0.9  # a pig is stable when its fate agrees in at least this fraction of replays
+STABLE = 0.9  # a robot is stable when its fate agrees in at least this fraction of replays
 TIME_TOLERANCE = 1  # frames (+-33 ms at 30 fps)
 
 
@@ -64,11 +64,11 @@ def eval_outcome(data_dir: Path, pred_path: Path) -> dict:
     for eid, ans in answers.items():
         pred = preds.get(eid)
         missing += pred is None
-        pred_alive = set(pred["pigs_alive"]) if pred else set()
+        pred_alive = set(pred["robots_alive"]) if pred else set()
         pred_p = {int(k): float(v) for k, v in (pred or {}).get("p_alive", {}).items()}
         p_alive = {int(k): v for k, v in ans["p_alive"].items()}
         ep_ok = True
-        for pid in ans["pig_ids"]:
+        for pid in ans["robot_ids"]:
             p = p_alive[pid]
             b = pid in pred_alive
             q = pred_p.get(pid, float(b))
@@ -83,16 +83,16 @@ def eval_outcome(data_dir: Path, pred_path: Path) -> dict:
         all_stable = all(p >= STABLE or p <= 1 - STABLE for p in p_alive.values())
         n_stable_eps += all_stable
         exact_stable_eps += all_stable and ep_ok
-        count_err += abs(len(pred_alive & set(ans["pig_ids"])) - sum(p_alive.values()))
+        count_err += abs(len(pred_alive & set(ans["robot_ids"])) - sum(p_alive.values()))
     n = len(answers)
     sp = [b for b, s in zip(pred_b, stable) if s]
     sl = [y for y, s in zip(label, stable) if s]
     return {
         "episodes": n,
         "missing_predictions": missing,
-        "stable_pig_balanced_accuracy": _balanced_accuracy(sp, sl),
-        "stable_pig_fraction": sum(stable) / max(len(stable), 1),
-        "all_pig_balanced_accuracy": _balanced_accuracy(pred_b, label),
+        "stable_robot_balanced_accuracy": _balanced_accuracy(sp, sl),
+        "stable_robot_fraction": sum(stable) / max(len(stable), 1),
+        "all_robot_balanced_accuracy": _balanced_accuracy(pred_b, label),
         "brier": float(np.mean(brier)),
         "brier_floor": float(np.mean(brier_floor)),
         "stable_episode_exact_match": exact_stable_eps / max(n_stable_eps, 1),
@@ -163,12 +163,12 @@ def _mean(ious: dict[str, float]) -> float:
     return float(np.mean(list(ious.values()))) if ious else 1.0
 
 
-def count_pigs(mask: np.ndarray) -> int:
-    labels, n = ndimage.label(mask == CLASSES.index("pig"))
+def count_robots(mask: np.ndarray) -> int:
+    labels, n = ndimage.label(mask == CLASSES.index("robot"))
     if n == 0:
         return 0
     areas = ndimage.sum_labels(np.ones_like(labels), labels, index=np.arange(1, n + 1))
-    return int((areas >= MIN_PIG_AREA).sum())
+    return int((areas >= MIN_ROBOT_AREA).sum())
 
 
 def _score_episode(args: tuple[Path, Path, str, int, int, str]) -> dict | None:
@@ -188,7 +188,7 @@ def _score_episode(args: tuple[Path, Path, str, int, int, str]) -> dict | None:
     return {
         "ious": _class_ious(iu),
         "final_ious": _class_ious(_inter_union(final_pred, gt[-1])),
-        "pigs": count_pigs(final_pred),
+        "robots": count_robots(final_pred),
     }
 
 
@@ -204,7 +204,7 @@ def eval_rollout(data_dir: Path, pred_dir: Path, workers: int = 8) -> dict:
     per_class: dict[str, list[float]] = {c: [] for c in DYNAMIC_CLASSES}
     miou_all, miou_final, count_exact, count_err, missing = [], [], 0, 0, 0
     for ans, r in zip(answers.values(), results):
-        n_gt = len(ans["pigs_alive"])
+        n_gt = len(ans["robots_alive"])
         if r is None:
             missing += 1
             miou_all.append(0.0)
@@ -215,8 +215,8 @@ def eval_rollout(data_dir: Path, pred_dir: Path, workers: int = 8) -> dict:
             per_class[k].append(v)
         miou_all.append(_mean(r["ious"]))
         miou_final.append(_mean(r["final_ious"]))
-        count_exact += r["pigs"] == n_gt
-        count_err += abs(r["pigs"] - n_gt)
+        count_exact += r["robots"] == n_gt
+        count_err += abs(r["robots"] - n_gt)
     n = len(answers)
     return {
         "episodes": n,
@@ -224,6 +224,6 @@ def eval_rollout(data_dir: Path, pred_dir: Path, workers: int = 8) -> dict:
         "miou_all_frames": float(np.mean(miou_all)),
         "miou_final_frame": float(np.mean(miou_final)),
         "iou_per_class": {k: float(np.mean(v)) for k, v in per_class.items() if v},
-        "final_pig_count_accuracy": count_exact / max(n, 1),
-        "final_pig_count_mae": count_err / max(n, 1),
+        "final_robot_count_accuracy": count_exact / max(n, 1),
+        "final_robot_count_mae": count_err / max(n, 1),
     }

@@ -6,15 +6,15 @@ import argparse
 import json
 from pathlib import Path
 
-from .slingshot import baselines, dataset, evaluate
+from .catapult import baselines, dataset, evaluate
 
 
 def main() -> None:
     ap = argparse.ArgumentParser(prog="physics-arcade")
     sub = ap.add_subparsers(dest="cmd", required=True)
 
-    g = sub.add_parser("generate", help="generate a Slingshot dataset")
-    g.add_argument("--out", type=Path, default=Path("data/slingshot_v0"))
+    g = sub.add_parser("generate", help="generate a Catapult dataset")
+    g.add_argument("--out", type=Path, default=Path("data/catapult_v0"))
     g.add_argument("--n", type=int, default=200)
     g.add_argument("--seed-offset", type=int, default=0)
     g.add_argument("--workers", type=int, default=8)
@@ -22,7 +22,7 @@ def main() -> None:
 
     sub.add_parser("fit-cartoon-lut", help="refit the color table used to segment cartoon-style frames")
 
-    eo = sub.add_parser("eval-outcome", help="score pig-survival predictions (jsonl)")
+    eo = sub.add_parser("eval-outcome", help="score robot-survival predictions (jsonl)")
     eo.add_argument("--data", type=Path, required=True)
     eo.add_argument("--pred", type=Path, required=True)
 
@@ -58,7 +58,7 @@ def main() -> None:
         dataset.write_dataset(args.out, args.n, args.seed_offset, args.workers, args.style)
         print(f"wrote {args.n} episodes to {args.out}")
     elif args.cmd == "fit-cartoon-lut":
-        from .slingshot.cartoon import build_lut
+        from .catapult.cartoon import build_lut
 
         print(json.dumps(build_lut(), indent=2))
     elif args.cmd == "eval-outcome":
@@ -66,12 +66,12 @@ def main() -> None:
     elif args.cmd == "eval-rollout":
         print(json.dumps(evaluate.eval_rollout(args.data, args.pred, args.workers), indent=2))
     elif args.cmd == "visualize":
-        from .slingshot.visualize import compare_video
+        from .catapult.visualize import compare_video
 
         pred = next(args.pred / f"{args.ep}{e}" for e in (".mp4", ".gif", ".npy") if (args.pred / f"{args.ep}{e}").exists())
         print(json.dumps(compare_video(args.data, pred, args.ep, args.out, args.label)))
     elif args.cmd == "predictability":
-        from .slingshot import predictability
+        from .catapult import predictability
 
         summary = predictability.analyze(args.data, args.out, args.runs, args.workers)
         summary["runs_per_condition"] = args.runs

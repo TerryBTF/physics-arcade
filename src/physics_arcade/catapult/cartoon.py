@@ -16,7 +16,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image, ImageDraw
 
-from .sim import GROUND_Y, HEIGHT, SLING_POS, WIDTH, World
+from .sim import GROUND_Y, HEIGHT, LAUNCH_POS, WIDTH, World
 
 SS = 3  # supersampling factor; frames are drawn at SS x size and downscaled for anti-aliasing
 LUT_PATH = Path(__file__).with_name("cartoon_lut.npy")
@@ -25,22 +25,16 @@ COLORS = {
     "wood": {"base": (196, 136, 66), "grain": (166, 108, 46), "edge": (122, 76, 32)},
     "stone": {"base": (142, 142, 152), "speck": (112, 112, 124), "edge": (86, 86, 98)},
     "ice": {"base": (176, 226, 246), "shine": (222, 246, 255), "edge": (110, 180, 216)},
-    "pig": {
-        "base": (128, 214, 62),
-        "edge": (58, 122, 30),
-        "snout": (172, 232, 112),
-        "nostril": (70, 132, 36),
-        "eye": (228, 246, 216),
-        "pupil": (24, 52, 14),
+    "robot": {
+        "base": (245, 205, 40),
+        "edge": (200, 160, 0),
+        "screen": (35, 45, 70),
+        "led": (130, 250, 150),
+        "bolt": (215, 175, 25),
+        "antenna": (70, 70, 80),
+        "tip": (235, 70, 60),
     },
-    "bird": {
-        "base": (214, 34, 38),
-        "edge": (120, 14, 18),
-        "belly": (242, 214, 184),
-        "beak": (246, 176, 34),
-        "eye": (250, 242, 236),
-        "pupil": (30, 10, 10),
-    },
+    "ball": {"base": (30, 100, 110), "edge": (16, 62, 70), "shine": (96, 164, 172)},
 }
 
 
@@ -86,13 +80,18 @@ def _background() -> Image.Image:
         tip = rng.uniform(2, 5)
         d.polygon([_px(x, GROUND_Y), _px(x + 2, GROUND_Y + tip), _px(x + 4, GROUND_Y)], fill=(66, 150, 84))
 
-    # Slingshot: a Y-shaped wooden fork.
-    sx, sy = SLING_POS
-    fork, band = (78, 52, 36), (52, 32, 26)
-    d.polygon([_px(sx - 4, GROUND_Y), _px(sx + 4, GROUND_Y), _px(sx + 3, sy - 22), _px(sx - 3, sy - 22)], fill=fork)
-    d.line([_px(sx, sy - 22), _px(sx - 9, sy + 4)], fill=fork, width=5 * SS)
-    d.line([_px(sx, sy - 22), _px(sx + 8, sy + 4)], fill=fork, width=5 * SS)
-    d.line([_px(sx - 9, sy + 2), _px(sx + 8, sy + 2)], fill=band, width=2 * SS)
+    # Catapult: a wheeled wooden frame with a throwing arm whose bucket sits at the launch point.
+    sx, sy = LAUNCH_POS
+    beam, dark, wheel = (78, 52, 36), (52, 32, 26), (60, 45, 35)
+    d.polygon([_px(sx - 26, GROUND_Y + 8), _px(sx + 16, GROUND_Y + 8), _px(sx + 12, GROUND_Y + 15), _px(sx - 22, GROUND_Y + 15)], fill=beam)
+    d.polygon([_px(sx - 8, GROUND_Y + 15), _px(sx - 2, GROUND_Y + 15), _px(sx - 4, GROUND_Y + 48), _px(sx - 9, GROUND_Y + 48)], fill=beam)
+    for wx in (sx - 18, sx + 8):
+        x, y = _px(wx, GROUND_Y + 7)
+        rr = 7 * SS
+        d.ellipse([x - rr, y - rr, x + rr, y + rr], fill=wheel)
+        d.ellipse([x - rr / 3, y - rr / 3, x + rr / 3, y + rr / 3], fill=dark)
+    d.line([_px(sx - 6, GROUND_Y + 44), _px(sx, sy - 6)], fill=beam, width=4 * SS)
+    d.chord([*_px(sx - 9, sy + 3), *_px(sx + 9, sy - 11)], 0, 180, fill=dark)
     return img
 
 
@@ -131,39 +130,36 @@ def _circle(d, center, r, fill):
     d.ellipse([x - r, y - r, x + r, y + r], fill=fill)
 
 
-def _pig(d: ImageDraw.ImageDraw, obj) -> None:
-    c = COLORS["pig"]
-    r = obj.size[0]
-    _circle(d, _px(*obj.body.position), r * SS, c["edge"])
-    _circle(d, _px(*obj.body.position), (r - 1.3) * SS, c["base"])
-    at = lambda x, y: _px(*obj.body.local_to_world((x * r, y * r)))  # noqa: E731
-    _circle(d, at(0.0, -0.1), 0.38 * r * SS, c["snout"])
-    _circle(d, at(-0.13, -0.1), 0.09 * r * SS, c["nostril"])
-    _circle(d, at(0.13, -0.1), 0.09 * r * SS, c["nostril"])
-    for sx in (-0.42, 0.42):
-        _circle(d, at(sx, 0.35), 0.2 * r * SS, c["eye"])
-        _circle(d, at(sx, 0.33), 0.09 * r * SS, c["pupil"])
+def _robot(d: ImageDraw.ImageDraw, obj) -> None:
+    """Square yellow robot: dark screen face with two LED eyes, side bolts, short antenna."""
+    c = COLORS["robot"]
+    h = obj.size[0] / 2
+
+    def box(x0, y0, x1, y1, fill):
+        d.polygon(_local(obj, [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]), fill=fill)
+
+    def dot(x, y, r, fill):
+        _circle(d, _px(*obj.body.local_to_world((x, y))), r * SS, fill)
+
+    box(-h, -h, h, h, c["edge"])
+    box(-h + 1.2, -h + 1.2, h - 1.2, h - 1.2, c["base"])
+    box(-0.7 * h, -0.05 * h, 0.7 * h, 0.6 * h, c["screen"])
+    for ex in (-0.32 * h, 0.32 * h):
+        dot(ex, 0.28 * h, 0.14 * h, c["led"])
+    for bx in (-0.72 * h, 0.72 * h):
+        dot(bx, -0.55 * h, 0.1 * h, c["bolt"])
+    box(-0.08 * h, h, 0.08 * h, h + 0.35 * h, c["antenna"])
+    dot(0.0, h + 0.4 * h, 0.14 * h, c["tip"])
 
 
-def _bird(d: ImageDraw.ImageDraw, obj) -> None:
-    c = COLORS["bird"]
+def _ball(d: ImageDraw.ImageDraw, obj) -> None:
+    """Iron cannonball with a highlight that keeps its place as the ball spins."""
+    c = COLORS["ball"]
     r = obj.size[0]
-    # Face along the velocity so the bird looks where it flies.
-    v = obj.body.velocity
-    ang = math.atan2(v.y, v.x) if v.length > 20 else 0.0
     cx, cy = obj.body.position
-
-    def at(x: float, y: float) -> tuple[float, float]:
-        ca, sa = math.cos(ang), math.sin(ang)
-        return _px(cx + (x * ca - y * sa) * r, cy + (x * sa + y * ca) * r)
-
     _circle(d, _px(cx, cy), r * SS, c["edge"])
     _circle(d, _px(cx, cy), (r - 1.2) * SS, c["base"])
-    _circle(d, at(0.1, -0.45), 0.45 * r * SS, c["belly"])
-    d.polygon([at(0.75, 0.15), at(1.3, -0.05), at(0.75, -0.3)], fill=c["beak"])
-    _circle(d, at(0.42, 0.28), 0.22 * r * SS, c["eye"])
-    _circle(d, at(0.5, 0.26), 0.1 * r * SS, c["pupil"])
-    d.line([at(0.15, 0.55), at(0.7, 0.42)], fill=c["edge"], width=max(1, int(0.18 * r * SS)))
+    _circle(d, _px(cx - 0.3 * r, cy + 0.3 * r), 0.3 * r * SS, c["shine"])
 
 
 def render_cartoon(world: World) -> Image.Image:
@@ -172,10 +168,10 @@ def render_cartoon(world: World) -> Image.Image:
     for o in world.objects:
         if not o.alive:
             continue
-        if o.kind == "pig":
-            _pig(d, o)
-        elif o.kind == "bird":
-            _bird(d, o)
+        if o.kind == "robot":
+            _robot(d, o)
+        elif o.kind == "ball":
+            _ball(d, o)
         else:
             _block(d, o)
     return img.resize((WIDTH, HEIGHT), Image.LANCZOS)
