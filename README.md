@@ -7,6 +7,27 @@ stone and ice blocks with pigs on and between them (2D rigid-body physics via
 [pymunk](https://www.pymunk.org)). A model sees the first 0.4 s of the bird's flight,
 before any contact, and has to predict what happens next.
 
+## Leaderboard: Slingshot outcome track
+
+Which pigs survive? Models see the launch frame with pig ids and 4 frames of the
+bird's flight (images only), 200 episodes. Headline metric: balanced accuracy on
+*stable* pigs (fate agrees in ≥ 90 % of perturbed replays); chance is 0.50.
+
+| Model | Flat ↑ | Cartoon ↑ | Brier ↓ (flat / cartoon) |
+|---|---|---|---|
+| Simulator reference† | 0.999 | 0.999 | 0.047 / 0.047 |
+| Ballistic path† | 0.663 | 0.663 | 0.368 / 0.368 |
+| Qwen3-VL-8B-Instruct (FP8) | 0.577 | 0.554 | 0.437 / 0.456 |
+| Qwen3-VL-4B-Instruct | 0.536 | 0.527 | 0.489 / 0.472 |
+| All alive / none alive | 0.500 | 0.500 | 0.50 / 0.50 |
+
+† Not a vision model: reads the exact launch speed and angle (the simulator reference
+also the exact scene) instead of images. Brier floor with perfect probabilities: 0.037.
+
+Qwen3-VL-8B's 95 % bootstrap interval is [0.53, 0.62] (flat) / [0.51, 0.60] (cartoon),
+just above chance; its lead over 4B is not significant (difference CI includes 0).
+Raw model answers are in [`results/slingshot/`](results/slingshot/).
+
 ## Tracks
 
 | Track | Model output | Metric |
@@ -44,6 +65,7 @@ uv run physics-arcade eval-outcome --data $D --pred preds/ballistic.jsonl
 uv run physics-arcade baseline --data $D --name oracle --out preds/rollout_oracle
 uv run physics-arcade eval-rollout --data $D --pred preds/rollout_oracle
 uv run physics-arcade visualize --data $D --pred preds/rollout_oracle --ep ep_00010 --out viz/ep_00010.mp4
+uv run physics-arcade leaderboard --data $D "Ballistic=preds/ballistic.jsonl" "Qwen3-VL-4B=results/slingshot/qwen3vl_4b_flat.jsonl"
 ```
 
 Dataset layout: `tasks.jsonl` and `inputs/<id>/` (context frames, context video, first
@@ -79,6 +101,20 @@ speed / 0.1°, 35 % of episodes keep the same outcome in every run and 16 % of p
 flip in 10–90 % of runs. These replays define the outcome-track labels.
 
 ## Models
+
+### Vision-language models (outcome track)
+
+`physics_arcade.vlm` holds the shared prompt, answer parsing and resumable loop; a
+backend only maps image/text parts to a reply. `models/qwen_vl/` runs Qwen3-VL locally
+(4B in bf16 or 8B in FP8 fit in 16 GB):
+
+```bash
+cd models/qwen_vl && ./setup.sh
+.venv/bin/python run_qwen_vl.py --model Qwen/Qwen3-VL-8B-Instruct-FP8 \
+    --data ../../data/slingshot_v0 --out ../../preds/qwen3vl_8b_flat.jsonl
+```
+
+### Video world models (rollout track)
 
 `models/cosmos/` runs NVIDIA Cosmos-Predict2-2B-Video2World (diffusers) in its own
 environment (`setup.sh`, CUDA 12.8 wheels for RTX 50-series). It needs a Hugging Face
