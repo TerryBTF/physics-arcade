@@ -3,8 +3,8 @@ the flat renderer. All artwork is original and procedural.
 
 Ground-truth class masks always come from the flat renderer. Each class keeps its
 own hue family (outlines and textures are darker or lighter shades of the base
-color), so a color lookup table fitted on rendered frames (see `build_lut`) can
-still map cartoon pixels back to classes for scoring.
+color), so a color lookup table fitted on rendered frames
+(physics_arcade.core.segment.fit_cartoon_lut) can map cartoon pixels back to classes.
 """
 
 from __future__ import annotations
@@ -175,77 +175,3 @@ def render_cartoon(world: World) -> Image.Image:
         else:
             _block(d, o)
     return img.resize((WIDTH, HEIGHT), Image.LANCZOS)
-
-
-# ---------------------------------------------------------------------------
-# Segmentation of cartoon frames
-
-
-def color_counts(frames: np.ndarray, masks: np.ndarray, n_classes: int) -> np.ndarray:
-    """(64**3, n_classes) histogram of 6-bit-per-channel colors per ground-truth class."""
-    q = frames.reshape(-1, 3) >> 2
-    idx = (q[:, 0].astype(np.int64) << 12) | (q[:, 1].astype(np.int64) << 6) | q[:, 2]
-    flat = idx * n_classes + masks.reshape(-1)
-    return np.bincount(flat, minlength=64**3 * n_classes).reshape(64**3, n_classes)
-
-
-def lut_from_counts(counts: np.ndarray) -> np.ndarray:
-    """Each populated color bin takes its majority class; empty bins take the class
-    of the nearest populated bin so unseen colors (e.g. from a generative model)
-    still get a sensible label."""
-    from scipy.spatial import cKDTree
-
-    seen = counts.sum(1) > 0
-    lut = counts.argmax(1).astype(np.uint8)
-    grid = np.stack(np.unravel_index(np.arange(64**3), (64, 64, 64)), axis=1)
-    _, nn = cKDTree(grid[seen]).query(grid[~seen])
-    lut[~seen] = lut[seen][nn]
-    return lut
-
-
-@lru_cache(maxsize=1)
-def cartoon_lut() -> np.ndarray:
-    if not LUT_PATH.exists():
-        raise FileNotFoundError(f"{LUT_PATH} missing; run `physics-arcade fit-cartoon-lut`")
-    return np.load(LUT_PATH)
-
-
-def build_lut(n_episodes: int = 60, seed_offset: int = 900_000, workers: int = 8) -> dict:
-    """Fit the cartoon LUT on held-out seeds and save it next to this module.
-
-    Frames are round-tripped through the same H.264 settings the dataset uses, and
-    through a bicubic upscale/downscale like the one video models' outputs go
-    through, so codec bleeding and resampling ringing at edges are part of the
-    training data.
-    """
-    from concurrent.futures import ProcessPoolExecutor
-
-    with ProcessPoolExecutor(max_workers=workers) as pool:
-        counts = sum(pool.map(_lut_counts, range(seed_offset, seed_offset + n_episodes)))
-    lut = lut_from_counts(counts)
-    np.save(LUT_PATH, lut)
-    correct = counts[np.arange(len(lut)), lut].sum()
-    return {"pixels": int(counts.sum()), "pixel_accuracy_on_fit_set": float(correct / counts.sum()), "out": str(LUT_PATH)}
-
-
-def _lut_counts(seed: int) -> np.ndarray:
-    import io
-
-    import imageio.v3 as iio
-
-    from .episode import generate_episode
-    from .render import CLASSES, segment
-    from .sim import FPS
-
-    ep = generate_episode(seed, "cartoon")
-    buf = io.BytesIO()
-    iio.imwrite(buf, np.stack(ep.display_frames), extension=".mp4", fps=FPS, codec="libx264", quality=9, macro_block_size=1)
-    decoded = iio.imread(buf.getvalue(), extension=".mp4")
-    sel = slice(0, None, 6)
-    raw = np.stack(ep.display_frames[sel])
-    masks = np.stack([segment(f) for f in ep.frames[sel]])
-    h, w = raw.shape[1:3]
-    resampled = np.stack(
-        [np.asarray(Image.fromarray(f).resize((1280, 704), Image.BICUBIC).resize((w, h), Image.BICUBIC)) for f in decoded[sel]]
-    )
-    return color_counts(np.concatenate([raw, decoded[sel], resampled]), np.concatenate([masks, masks, masks]), len(CLASSES))

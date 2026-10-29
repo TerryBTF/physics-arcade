@@ -1,4 +1,4 @@
-"""Generate one benchmark episode: a settled level, a launch, and the recorded rollout."""
+"""Catapult episodes: a settled level, a launch, the recorded rollout, and perturbed replays."""
 
 from __future__ import annotations
 
@@ -7,8 +7,8 @@ import random
 from dataclasses import dataclass
 
 import numpy as np
-from PIL import Image
 
+from ...core.game import Episode
 from .cartoon import render_cartoon
 from .levels import generate_level
 from .render import label_robots, render
@@ -29,22 +29,6 @@ from .sim import (
 CONTEXT_FRAMES = 12  # 0.4 s of the ball in flight
 TOTAL_FRAMES = 180  # 6 s
 SETTLE_SPEED = 8.0  # px/s; episode must be at rest by the last frame
-
-
-@dataclass
-class Episode:
-    seed: int
-    attempt: int  # index of the accepted setup, for setup_for()
-    speed: float
-    angle: float
-    frames: list[np.ndarray]  # flat style; the source of ground-truth class masks
-    display_frames: list[np.ndarray]  # what the model sees (same as `frames` for the flat style)
-    labeled_first_frame: Image.Image
-    robots_initial: dict[int, tuple[float, float, float]]  # id -> (x, y, r)
-    robots_alive: list[int]
-    blocks_initial: int
-    blocks_destroyed: int
-    first_contact_time: float | None
 
 
 def _snapshot(world: World) -> list[tuple[str, float, float, float]]:
@@ -86,12 +70,12 @@ class Setup:
     angle: float
 
 
-def setups(seed: int, max_tries: int = 50):
+def setups(seed: int, difficulty: str, max_tries: int = 50):
     """Yield every candidate setup for `seed` in order. Random numbers are consumed
     only here (never during rollouts), so replaying the first k setups is exact."""
-    rng = random.Random(seed)
+    rng = random.Random(f"{difficulty}-{seed}")
     for attempt in range(max_tries):
-        world = generate_level(rng)
+        world = generate_level(rng, difficulty)
         if not world.robots:
             continue
         before = _snapshot(world)
@@ -104,12 +88,12 @@ def setups(seed: int, max_tries: int = 50):
         yield Setup(attempt, world, *launch)
 
 
-def setup_for(seed: int, attempt: int) -> Setup:
-    """Rebuild the setup that `generate_episode(seed)` accepted (see Episode.attempt)."""
-    for s in setups(seed):
+def setup_for(seed: int, difficulty: str, attempt: int) -> Setup:
+    """Rebuild the setup that `generate(seed, difficulty)` accepted."""
+    for s in setups(seed, difficulty):
         if s.attempt == attempt:
             return s
-    raise ValueError(f"seed {seed} has no setup with attempt {attempt}")
+    raise ValueError(f"seed {seed} ({difficulty}) has no setup with attempt {attempt}")
 
 
 def rollout(world: World, speed: float, angle: float, style: str | None = "flat"):
@@ -138,32 +122,52 @@ def rollout(world: World, speed: float, angle: float, style: str | None = "flat"
     return frames, display, labeled
 
 
-def generate_episode(seed: int, style: str = "flat", max_tries: int = 50) -> Episode:
-    """Deterministically generate an episode from a seed (retrying internally on rejects)."""
-    for s in setups(seed, max_tries):
+def generate(seed: int, difficulty: str, style: str = "flat", max_tries: int = 50) -> Episode:
+    """Deterministically generate an episode (retrying internally on rejected setups)."""
+    for s in setups(seed, difficulty, max_tries):
         world = s.world
-        robots_initial = {p.robot_id: (*p.body.position, p.size[0] / 2) for p in world.robots}  # (x, y, half-size)
+        robots = {p.robot_id: (*p.body.position, p.size[0] / 2) for p in world.robots}  # (x, y, half-size)
         blocks_initial = sum(o.kind not in ("robot", "ball") for o in world.objects)
         frames, display, labeled = rollout(world, s.speed, s.angle, style)
-
-        # Ball must still be in free flight for the whole context window.
-        ctx_t = CONTEXT_FRAMES / FPS
-        if world.first_contact_time is not None and world.first_contact_time < ctx_t:
+        # Ball must still be in free flight for the whole context window, and everything at rest at the end.
+        if world.first_contact_time is not None and world.first_contact_time < CONTEXT_FRAMES / FPS:
             continue
         if max_speed(world) > SETTLE_SPEED:
             continue
         return Episode(
             seed=seed,
-            attempt=s.attempt,
-            speed=s.speed,
-            angle=s.angle,
+            difficulty=difficulty,
             frames=frames,
             display_frames=display,
-            labeled_first_frame=labeled,
-            robots_initial=robots_initial,
-            robots_alive=sorted(p.robot_id for p in world.robots if p.alive),
-            blocks_initial=blocks_initial,
-            blocks_destroyed=sum(not o.alive for o in world.objects if o.kind not in ("robot", "ball")),
-            first_contact_time=world.first_contact_time,
+            labeled_frame=labeled,
+            target_ids=sorted(robots),
+            recorded_ids=sorted(p.robot_id for p in world.robots if p.alive),
+            replay_key={"attempt": s.attempt},
+            info={
+                "launch": {"speed": round(s.speed, 2), "angle_deg": round(s.angle, 2)},
+                "targets": {str(k): {"x": round(x, 1), "y": round(y, 1), "r": round(r, 1)} for k, (x, y, r) in robots.items()},
+            },
+            extra={
+                "launch": {"speed": s.speed, "angle_deg": s.angle},
+                "blocks_initial": blocks_initial,
+                "blocks_destroyed": sum(not o.alive for o in world.objects if o.kind not in ("robot", "ball")),
+                "first_contact_time": world.first_contact_time,
+            },
         )
-    raise RuntimeError(f"could not generate a valid episode for seed {seed}")
+    raise RuntimeError(f"could not generate a valid {difficulty} episode for seed {seed}")
+
+
+def replay(seed: int, difficulty: str, replay_key: dict, noise: dict, rng: random.Random) -> list[int]:
+    """Re-run the accepted setup with Gaussian noise on the launch (relative speed, angle in
+    degrees) and on the horizontal position of every object (pixels); return surviving robots."""
+    s = setup_for(seed, difficulty, replay_key["attempt"])
+    if noise.get("pos"):
+        for o in s.world.objects:
+            x, y = o.body.position
+            o.body.position = (x + rng.gauss(0, noise["pos"]), y)
+            s.world.space.reindex_shapes_for_body(o.body)
+            o.body.activate()
+    speed = s.speed * (1 + rng.gauss(0, noise.get("speed", 0.0)))
+    angle = s.angle + rng.gauss(0, noise.get("angle", 0.0))
+    rollout(s.world, speed, angle, None)
+    return sorted(p.robot_id for p in s.world.robots if p.alive)

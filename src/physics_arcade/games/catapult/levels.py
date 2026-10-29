@@ -15,10 +15,13 @@ def _material(rng: random.Random) -> str:
     return rng.choices(["wood", "stone", "ice"], weights=[0.5, 0.25, 0.25])[0]
 
 
-def _tower(world: World, rng: random.Random, x0: float, next_robot: list[int]) -> float:
+FLOOR_WEIGHTS = {"easy": [0.5, 0.5, 0.0], "medium": [0.35, 0.4, 0.25], "hard": [0.15, 0.35, 0.5]}
+
+
+def _tower(world: World, rng: random.Random, x0: float, next_robot: list[int], difficulty: str = "medium") -> float:
     """Build a stack of post-and-plank storeys starting at x0. Returns right edge."""
     span = rng.uniform(36, 64)
-    floors = rng.choices([1, 2, 3], weights=[0.35, 0.4, 0.25])[0]
+    floors = rng.choices([1, 2, 3], weights=FLOOR_WEIGHTS[difficulty])[0]
     width = span + POST_W
     cx = x0 + width / 2
     base = GROUND_Y
@@ -40,7 +43,7 @@ def _tower(world: World, rng: random.Random, x0: float, next_robot: list[int]) -
     return x0 + width + 8
 
 
-def _pedestal(world: World, rng: random.Random, x0: float, next_robot: list[int]) -> float:
+def _pedestal(world: World, rng: random.Random, x0: float, next_robot: list[int], difficulty: str = "medium") -> float:
     w, h = rng.uniform(18, 30), rng.uniform(15, 45)
     add_block(world, _material(rng), x0 + w / 2, GROUND_Y + h / 2, w, h)
     r = rng.uniform(8, min(12, w / 2))
@@ -48,7 +51,7 @@ def _pedestal(world: World, rng: random.Random, x0: float, next_robot: list[int]
     return x0 + w
 
 
-def _ground_robot(world: World, rng: random.Random, x0: float, next_robot: list[int]) -> float:
+def _ground_robot(world: World, rng: random.Random, x0: float, next_robot: list[int], difficulty: str = "medium") -> float:
     r = rng.uniform(8, 12)
     add_robot(world, _take(next_robot), x0 + r, GROUND_Y + r, r)
     return x0 + 2 * r
@@ -59,16 +62,28 @@ def _take(counter: list[int]) -> int:
     return counter[0]
 
 
-def generate_level(rng: random.Random) -> World:
-    """Place towers, pedestals and loose robots left-to-right inside the structure zone."""
+DIFFICULTIES = ("easy", "medium", "hard")
+
+
+def generate_level(rng: random.Random, difficulty: str = "hard") -> World:
+    """Place structures left-to-right inside the structure zone.
+
+    easy: one tower (1-2 storeys) or pedestal, plus maybe a robot on the ground.
+    medium: two structures, towers up to 3 storeys.
+    hard: structures until the zone is full, mostly 2-3 storey towers.
+    """
     world = new_world()
     next_robot = [0]
-    x = STRUCT_X_MIN + rng.uniform(0, 40)
-    builders = [_tower, _tower, _tower, _pedestal, _ground_robot]
-    while True:
-        builder = rng.choice(builders)
-        # Rough width check so structures stay on screen.
-        if x + 90 > STRUCT_X_MAX:
-            break
-        x = builder(world, rng, x, next_robot) + rng.uniform(6, 30)
+    if difficulty == "hard":
+        x = STRUCT_X_MIN + rng.uniform(0, 40)
+        builders = [_tower, _tower, _tower, _pedestal, _ground_robot]
+        while x + 90 <= STRUCT_X_MAX:  # rough width check so structures stay on screen
+            x = rng.choice(builders)(world, rng, x, next_robot, difficulty) + rng.uniform(6, 30)
+        return world
+    n = 1 if difficulty == "easy" else 2
+    x = STRUCT_X_MIN + rng.uniform(0, 140 if n == 1 else 60)
+    for _ in range(n):
+        x = rng.choice([_tower, _tower, _pedestal])(world, rng, x, next_robot, difficulty) + rng.uniform(10, 40)
+    if difficulty == "easy" and rng.random() < 0.5 and x + 30 <= STRUCT_X_MAX:
+        _ground_robot(world, rng, x, next_robot, difficulty)
     return world

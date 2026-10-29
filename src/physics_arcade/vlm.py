@@ -5,10 +5,10 @@ A backend only has to turn a list of message parts into text:
     parts = [{"type": "image", "path": Path}, {"type": "text", "text": str}, ...]
     backend(parts) -> str
 
-`run` builds the prompt for every episode, calls the backend, parses the final
-JSON answer, and appends one line per episode to the predictions file (resuming
-if it already exists). The model sees images and text only, never the numeric
-launch parameters or robot coordinates in tasks.jsonl.
+`run` builds the prompt for every episode (the game's description and question plus a
+shared answer format), calls the backend, parses the final JSON answer, and appends one
+line per episode to the predictions file (resuming if it already exists). The model sees
+images and text only, never the numeric extras in tasks.jsonl "info".
 """
 
 from __future__ import annotations
@@ -19,35 +19,32 @@ import time
 from pathlib import Path
 from typing import Callable
 
+from .core.game import Game
+
 Backend = Callable[[list[dict]], str]
 
-# Context frames shown to the model, out of the 12 available (0.4 s at 30 fps).
-FRAME_IDS = (0, 4, 8, 11)
+# Context frames shown to the model, spread over the context window.
+N_FRAMES = 4
 
-PROMPT = """You are looking at a 2D physics game shown from the side. Gravity points down.
-
-A cannonball was just fired from the catapult on the left. The first image shows the level at launch with every robot labeled by its id. The next {n} images are frames of the cannonball's flight at t = {times} seconds. The frames stop before the cannonball hits anything: your job is to predict what happens AFTER the last frame. Extrapolate the cannonball's trajectory (it keeps flying along its arc under gravity) and work out what it will hit and what follows.
-
-Rules of the game:
-- The cannonball flies on, hits whatever is in its path, and pushes, topples or breaks blocks.
-- Blocks are wood (brown), stone (gray, heaviest and strongest) or ice (pale blue, light and brittle).
-- Robots are small yellow boxes. A robot is destroyed when it is hit hard enough: by the cannonball, by a falling or sliding block, or by falling itself. Robots that are only nudged survive.
-- The game is over when everything has come to rest.
-
-Question: which robots are still alive when everything has come to rest, after the cannonball's impact and any collapse it causes?
+ANSWER_FORMAT = """
 
 Think it through briefly. Then finish with one line containing only a JSON object of this form:
-{{"alive": [<ids of robots that survive>], "p_alive": {{"<id>": <probability that this robot survives>, ...}}}}
-Use the robot ids from the first image: {ids}."""
+{{"{event}": [<ids of {target}s for which this is true>], "p_{event}": {{"<id>": <probability that it is true for this {target}>, ...}}}}
+Use the {target} ids from the first image: {ids}."""
 
 
-def build_parts(data_dir: Path, task: dict) -> list[dict]:
-    fps = 30
-    times = ", ".join(f"{i / fps:.2f}" for i in FRAME_IDS)
+def frame_ids(n_ctx: int) -> list[int]:
+    return sorted({round(i * (n_ctx - 1) / (N_FRAMES - 1)) for i in range(N_FRAMES)})
+
+
+def build_parts(data_dir: Path, task: dict, game: Game, fps: int) -> list[dict]:
+    ids_shown = frame_ids(len(task["context_frames"]))
+    times = ", ".join(f"{i / fps:.2f}" for i in ids_shown)
     parts: list[dict] = [{"type": "image", "path": data_dir / task["labeled_frame"]}]
-    parts += [{"type": "image", "path": data_dir / task["context_frames"][i]} for i in FRAME_IDS]
-    ids = ", ".join(str(i) for i in task["robot_ids"])
-    parts.append({"type": "text", "text": PROMPT.format(n=len(FRAME_IDS), times=times, ids=ids)})
+    parts += [{"type": "image", "path": data_dir / task["context_frames"][i]} for i in ids_shown]
+    ids = ", ".join(str(i) for i in task["target_ids"])
+    text = game.vlm_prompt(len(ids_shown), times) + ANSWER_FORMAT.format(event=game.event, target=game.target, ids=ids)
+    parts.append({"type": "text", "text": text})
     return parts
 
 
@@ -57,9 +54,9 @@ FOLLOW_UP = (
 )
 
 
-def parse_answer(text: str, robot_ids: list[int]) -> dict | None:
-    """Extract {"robots_alive": [...], "p_alive": {...}} from the last JSON object in `text`."""
-    valid = set(robot_ids)
+def parse_answer(text: str, target_ids: list[int], event: str) -> dict | None:
+    """Extract {"ids": [...], "p": {...}} from the last JSON object in `text` with key `event`."""
+    valid = set(target_ids)
     for m in reversed(list(re.finditer(r"\{(?:[^{}]|\{[^{}]*\})*\}", text))):
         # Models sometimes write bare numeric keys ({1: 0.5}); quote them.
         candidate = re.sub(r"([{,]\s*)(\d+)(\s*:)", r'\1"\2"\3', m.group(0))
@@ -67,24 +64,27 @@ def parse_answer(text: str, robot_ids: list[int]) -> dict | None:
             obj = json.loads(candidate)
         except json.JSONDecodeError:
             continue
-        if not isinstance(obj, dict) or "alive" not in obj:
+        if not isinstance(obj, dict) or event not in obj:
             continue
         try:
-            alive = sorted({int(i) for i in obj["alive"]} & valid)
-            p_alive = {}
-            for k, v in (obj.get("p_alive") or {}).items():
+            ids = sorted({int(i) for i in obj[event]} & valid)
+            probs = {}
+            for k, v in (obj.get(f"p_{event}") or {}).items():
                 if int(k) in valid:
-                    p_alive[str(int(k))] = min(1.0, max(0.0, float(v)))
+                    probs[str(int(k))] = min(1.0, max(0.0, float(v)))
         except (TypeError, ValueError):
             continue
-        out = {"robots_alive": alive}
-        if p_alive:
-            out["p_alive"] = p_alive
+        out = {"ids": ids}
+        if probs:
+            out["p"] = probs
         return out
     return None
 
 
 def run(backend: Backend, data_dir: Path, out_path: Path, limit: int | None = None, model_name: str = "") -> dict:
+    from .core.evaluate import game_of, load_manifest
+
+    game, fps = game_of(data_dir), load_manifest(data_dir)["fps"]
     tasks = [json.loads(line) for line in (data_dir / "tasks.jsonl").read_text().splitlines() if line]
     tasks = tasks[:limit]
     done = set()
@@ -97,24 +97,24 @@ def run(backend: Backend, data_dir: Path, out_path: Path, limit: int | None = No
             if task["id"] in done:
                 continue
             t0 = time.time()
-            parts = build_parts(data_dir, task)
+            parts = build_parts(data_dir, task, game, fps)
             text = backend(parts)
-            answer = parse_answer(text, task["robot_ids"])
+            answer = parse_answer(text, task["target_ids"], game.event)
             row = {"id": task["id"], "model": model_name, "raw": text}
             if answer is None:
                 # One retry that shows the model the end of its own answer and asks for the JSON only.
                 retry = backend(parts + [{"type": "text", "text": FOLLOW_UP.format(tail=text[-1500:])}])
-                answer = parse_answer(retry, task["robot_ids"])
+                answer = parse_answer(retry, task["target_ids"], game.event)
                 row["raw_retry"] = retry
             row["seconds"] = round(time.time() - t0, 1)
             if answer is None:
                 failed += 1
-                row["robots_alive"] = []  # unparseable answers count as "none alive"
+                row["ids"] = []  # unparseable answers count as "the event happens to no target"
                 row["parse_error"] = True
             else:
                 parsed += 1
                 row.update(answer)
             f.write(json.dumps(row) + "\n")
             f.flush()
-            print(json.dumps({k: row[k] for k in ("id", "seconds", "robots_alive")} | {"parse_error": answer is None}), flush=True)
+            print(json.dumps({k: row[k] for k in ("id", "seconds", "ids")} | {"parse_error": answer is None}), flush=True)
     return {"new": parsed + failed, "parse_failures": failed}

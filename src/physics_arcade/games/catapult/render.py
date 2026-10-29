@@ -1,9 +1,8 @@
 """Flat-color renderer. Every object class has exactly one color so frames can be
-segmented back into class masks for automatic evaluation."""
+segmented back into class masks (physics_arcade.core.segment) for automatic evaluation."""
 
 from __future__ import annotations
 
-import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
 from .sim import GROUND_Y, HEIGHT, LAUNCH_POS, WIDTH, World
@@ -63,30 +62,3 @@ def label_robots(img: Image.Image, world: World) -> Image.Image:
         d.rectangle([tx - 3, ty - 2, tx + tw + 3, ty + th + 5], fill=(255, 255, 255), outline=(0, 0, 0))
         d.text((tx, ty - box[1] + 1), text, fill=(0, 0, 0), font=font)
     return img
-
-
-def segment(frame: np.ndarray, style: str = "flat") -> np.ndarray:
-    """Map an RGB frame (H, W, 3) to class indices (H, W).
-
-    Flat frames use the nearest palette color; cartoon frames use a color table
-    fitted on rendered episodes (see cartoon.build_lut).
-    """
-    if style == "flat":
-        lut = _LUT
-    else:
-        from .cartoon import cartoon_lut
-
-        lut = cartoon_lut()
-    f = frame[..., :3] >> 2
-    return lut[(f[..., 0].astype(np.int32) << 12) | (f[..., 1].astype(np.int32) << 6) | f[..., 2]]
-
-
-def _build_lut() -> np.ndarray:
-    """Nearest palette class for every color quantized to 6 bits per channel."""
-    pal = np.array([PALETTE[c] for c in CLASSES], dtype=np.int32)
-    q = np.arange(64, dtype=np.int32) * 4 + 2
-    grid = np.stack(np.meshgrid(q, q, q, indexing="ij"), axis=-1).reshape(-1, 1, 3)
-    return ((grid - pal) ** 2).sum(-1).argmin(-1).astype(np.uint8)
-
-
-_LUT = _build_lut()
