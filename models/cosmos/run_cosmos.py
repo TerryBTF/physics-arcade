@@ -23,12 +23,15 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import time
 from pathlib import Path
 
 import imageio.v3 as iio
 import numpy as np
-import torch
+os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
+
+import torch  # noqa: E402
 from diffusers import Cosmos2VideoToWorldPipeline
 from huggingface_hub import snapshot_download
 from PIL import Image
@@ -85,6 +88,7 @@ def main() -> None:
     pipe._exclude_from_cpu_offload = ["safety_checker"]
     pipe.enable_model_cpu_offload()  # T5-XXL + DiT + VAE do not fit in 16 GB together
     pipe.safety_checker.to("cpu")
+    pipe.vae.enable_tiling()  # encoding 93 frames at 1280x704 in one piece does not fit in 16 GB
 
     cidx = cond_indices(n_ctx)
     log = []
