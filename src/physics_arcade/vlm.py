@@ -26,7 +26,7 @@ FRAME_IDS = (0, 4, 8, 11)
 
 PROMPT = """You are looking at a 2D physics game shown from the side. Gravity points down.
 
-A bird was just launched from the slingshot on the left. The first image shows the level at launch with every pig labeled by its id. The next {n} images are frames of the bird's flight at t = {times} seconds; it has not hit anything yet.
+A bird was just launched from the slingshot on the left. The first image shows the level at launch with every pig labeled by its id. The next {n} images are frames of the bird's flight at t = {times} seconds. The frames stop before the bird hits anything: your job is to predict what happens AFTER the last frame. Extrapolate the bird's trajectory (it keeps flying along its arc under gravity) and work out what it will hit and what follows.
 
 Rules of the game:
 - The bird flies on, hits whatever is in its path, and pushes, topples or breaks blocks.
@@ -34,7 +34,7 @@ Rules of the game:
 - A pig dies when it is hit hard enough: by the bird, by a falling or sliding block, or by falling itself. Pigs that are only nudged survive.
 - The game is over when everything has come to rest.
 
-Question: which pigs are still alive when everything has come to rest?
+Question: which pigs are still alive when everything has come to rest, after the bird's impact and any collapse it causes?
 
 Think it through briefly. Then finish with one line containing only a JSON object of this form:
 {{"alive": [<ids of pigs that survive>], "p_alive": {{"<id>": <probability that this pig survives>, ...}}}}
@@ -51,12 +51,20 @@ def build_parts(data_dir: Path, task: dict) -> list[dict]:
     return parts
 
 
+FOLLOW_UP = (
+    "Your previous answer did not end with the required JSON line. Here is how it ended:\n\n{tail}\n\n"
+    "Reply with only the JSON line now."
+)
+
+
 def parse_answer(text: str, pig_ids: list[int]) -> dict | None:
     """Extract {"pigs_alive": [...], "p_alive": {...}} from the last JSON object in `text`."""
     valid = set(pig_ids)
     for m in reversed(list(re.finditer(r"\{(?:[^{}]|\{[^{}]*\})*\}", text))):
+        # Models sometimes write bare numeric keys ({1: 0.5}); quote them.
+        candidate = re.sub(r"([{,]\s*)(\d+)(\s*:)", r'\1"\2"\3', m.group(0))
         try:
-            obj = json.loads(m.group(0))
+            obj = json.loads(candidate)
         except json.JSONDecodeError:
             continue
         if not isinstance(obj, dict) or "alive" not in obj:
@@ -89,9 +97,16 @@ def run(backend: Backend, data_dir: Path, out_path: Path, limit: int | None = No
             if task["id"] in done:
                 continue
             t0 = time.time()
-            text = backend(build_parts(data_dir, task))
+            parts = build_parts(data_dir, task)
+            text = backend(parts)
             answer = parse_answer(text, task["pig_ids"])
-            row = {"id": task["id"], "model": model_name, "seconds": round(time.time() - t0, 1), "raw": text}
+            row = {"id": task["id"], "model": model_name, "raw": text}
+            if answer is None:
+                # One retry that shows the model the end of its own answer and asks for the JSON only.
+                retry = backend(parts + [{"type": "text", "text": FOLLOW_UP.format(tail=text[-1500:])}])
+                answer = parse_answer(retry, task["pig_ids"])
+                row["raw_retry"] = retry
+            row["seconds"] = round(time.time() - t0, 1)
             if answer is None:
                 failed += 1
                 row["pigs_alive"] = []  # unparseable answers count as "none alive"

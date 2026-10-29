@@ -20,7 +20,7 @@ from transformers import AutoModelForImageTextToText, AutoProcessor
 from physics_arcade.vlm import run
 
 
-def make_backend(model_id: str, max_new_tokens: int):
+def make_backend(model_id: str, max_new_tokens: int, seed: int = 0):
     processor = AutoProcessor.from_pretrained(model_id)
     model = AutoModelForImageTextToText.from_pretrained(model_id, dtype=torch.bfloat16, device_map="cuda")
     model.eval()
@@ -37,8 +37,12 @@ def make_backend(model_id: str, max_new_tokens: int):
             return_dict=True,
             return_tensors="pt",
         ).to(model.device)
+        # Qwen3-VL's recommended sampling (greedy decoding tends to loop); fixed seed for reproducibility.
+        torch.manual_seed(seed)
         with torch.inference_mode():
-            out = model.generate(**inputs, max_new_tokens=max_new_tokens, do_sample=False)
+            out = model.generate(
+                **inputs, max_new_tokens=max_new_tokens, do_sample=True, temperature=0.7, top_p=0.8, top_k=20
+            )
         return processor.decode(out[0, inputs["input_ids"].shape[1] :], skip_special_tokens=True)
 
     return backend
@@ -51,8 +55,9 @@ def main() -> None:
     ap.add_argument("--model", default="Qwen/Qwen3-VL-4B-Instruct")
     ap.add_argument("--limit", type=int, default=None)
     ap.add_argument("--max-new-tokens", type=int, default=1024)
+    ap.add_argument("--seed", type=int, default=0)
     args = ap.parse_args()
-    backend = make_backend(args.model, args.max_new_tokens)
+    backend = make_backend(args.model, args.max_new_tokens, args.seed)
     print(json.dumps(run(backend, args.data, args.out, args.limit, args.model)))
 
 
