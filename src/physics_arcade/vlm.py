@@ -29,8 +29,11 @@ N_FRAMES = 4
 ANSWER_FORMAT = """
 
 Think it through briefly. Then finish with one line containing only a JSON object of this form:
-{{"{event}": [<ids of {target}s for which this is true>], "p_{event}": {{"<id>": <probability that it is true for this {target}>, ...}}}}
-Use the {target} ids from the first image: {ids}."""
+{{"{event}": [<ids>], "p_{event}": {{"<id>": <probability>, ...}}}}
+- "{event}" lists the ids of the {target}s that are {event} once everything has come to rest.
+- "p_{event}" gives, for every {target} id, your probability (0 to 1) that the {target} is {event}.
+- The list must contain exactly the ids whose probability is above 0.5.
+The {target} ids are those labeled in the first image: {ids}."""
 
 
 def frame_ids(n_ctx: int) -> list[int]:
