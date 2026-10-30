@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>physics-arcade</title>
+<meta name="description" content="Can AI models predict what happens next in simple physics games? A benchmark of Catapult, Pool and Dominoes, with a leaderboard and a human challenge.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">physics-arcade benchmark</p>
+    <h1>Can AI predict what happens next?</h1>
+    <p class="lede">Three tiny physics games. A model sees the first 0.4&nbsp;seconds of a shot, before anything collides, and has to call the outcome. So far, vision-language models barely beat a coin flip.</p>
+    <div class="cta">
+      <a class="btn primary" href="#play">Play the challenge</a>
+      <a class="btn" href="#leaderboard">Leaderboard</a>
+      <a class="btn" href="https://github.com/TerryBTF/physics-arcade">GitHub</a>
+    </div>
+    <div class="games">
+      <figure><img src="media/catapult.gif" alt="Catapult: a cannonball knocks over towers with robots" loading="lazy"><figcaption><b>Catapult</b> Which robots survive?</figcaption></figure>
+      <figure><img src="media/pool.gif" alt="Pool: the cue ball breaks a cluster of balls" loading="lazy"><figcaption><b>Pool</b> Which balls get potted?</figcaption></figure>
+      <figure><img src="media/dominoes.gif" alt="Dominoes: a ball knocks over a domino chain" loading="lazy"><figcaption><b>Dominoes</b> Which dominoes fall?</figcaption></figure>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section id="leaderboard" class="wrap">
+    <h2>Leaderboard</h2>
+    <p class="muted">Balanced accuracy on targets whose fate is clear-cut (it agrees in at least 90&nbsp;% of 50 slightly perturbed replays). Chance is 0.50. 300 episodes per game, 100 per difficulty.</p>
+    <div class="controls">
+      <div class="seg" id="lb-game" role="tablist" aria-label="Game"></div>
+      <div class="seg" id="lb-style" role="tablist" aria-label="Render style"></div>
+    </div>
+    <div class="table-scroll"><table id="lb-table"></table></div>
+    <p class="muted small">Bars show the 95&nbsp;% bootstrap interval. Reference rows are not vision models: they read exact positions and launch numbers. Raw answers are in the <a href="https://github.com/TerryBTF/physics-arcade/tree/main/results/v1">repository</a>.</p>
+  </section>
+
+  <section id="play" class="wrap">
+    <h2>Beat the models</h2>
+    <p class="muted">Eight rounds per game, the same ones the models answered. Watch the shot, click the targets you think the event happens to, then see what really happens.</p>
+    <div id="game-picker" class="picker"></div>
+    <div id="round" class="round" hidden>
+      <div class="round-head">
+        <span id="round-title"></span>
+        <span id="round-progress" class="muted"></span>
+      </div>
+      <p id="round-prompt" class="prompt"></p>
+      <div class="stage" id="stage">
+        <img id="stage-still" alt="">
+        <video id="stage-video" muted playsinline preload="auto"></video>
+        <div id="stage-targets" class="targets"></div>
+      </div>
+      <div class="round-actions">
+        <button class="btn" id="btn-replay" type="button">Replay the shot</button>
+        <button class="btn primary" id="btn-submit" type="button">Lock in my answer</button>
+        <button class="btn primary" id="btn-next" type="button" hidden>Next round</button>
+      </div>
+      <div id="round-result" class="result" hidden></div>
+    </div>
+    <div id="summary" class="summary" hidden></div>
+  </section>
+
+  <section id="gallery" class="wrap">
+    <h2>How the models get it wrong</h2>
+    <p class="muted">For each game and model, the episode where it missed the most clear-cut targets, with its own reasoning when it gave any.</p>
+    <div id="gallery-grid" class="grid"></div>
+  </section>
+
+  <section id="about" class="wrap">
+    <h2>How it works</h2>
+    <div class="cols">
+      <div><h3>Fair answer keys</h3><p>Collisions are chaotic: a launch that differs by 0.25&nbsp;% in speed can change who survives. Every episode is replayed 50 times under such tiny perturbations, and each target's label is how often its event happens. Scores count only targets with a clear-cut fate.</p></div>
+      <div><h3>Difficulty and style</h3><p>Each game has easy, medium and hard levels, and two render styles with identical physics: flat colors and textured cartoon. All levels come from a physics simulator, so there is no limit on data and the ground truth is exact.</p></div>
+      <div><h3>Add your model</h3><p>The evaluation harness takes any model that maps images and text to a reply. Run it, then score with <code>physics-arcade leaderboard</code>. See the <a href="https://github.com/TerryBTF/physics-arcade">README</a>.</p></div>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap muted small">physics-arcade · all levels, physics and artwork are generated procedurally · <a href="https://github.com/TerryBTF/physics-arcade">source on GitHub</a></footer>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,6 +1,7 @@
 # physics-arcade
 
 **Can AI models predict what happens next in simple physics games?**
+**[Leaderboard, failure gallery and a human challenge →](https://terrybtf.github.io/physics-arcade/)**
 
 physics-arcade is a benchmark of small 2D physics games. A model watches the first
 0.4 s of a shot, before anything collides, and has to predict the outcome. Every
@@ -124,6 +125,12 @@ cd models/qwen_vl && ./setup.sh
 (Catapult prompts; needs Hugging Face access to the gated Cosmos and guardrail repos).
 `models/cosmos/dry_run.py` pushes ground truth through the same 16 fps resampling path to
 measure its ceiling.
+
+## Website
+
+The site in `docs/` (GitHub Pages) is static. `uv run python scripts/build_site.py`
+rebuilds its data and media from the cartoon datasets and `results/v1/`; preview it with
+`python3 -m http.server --directory docs`.
 
 ## Adding a game
 
