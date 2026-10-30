@@ -20,26 +20,37 @@ Each cell is flat style / cartoon style.
 
 | Model | Catapult | Pool | Dominoes |
 |---|---|---|---|
-| Qwen3-VL-4B-Instruct | 0.554 / 0.549 | 0.633 / 0.605 | 0.501 / 0.500 |
-| Qwen3-VL-8B-Instruct (FP8) | running | running | running |
+| Qwen3-VL-4B-Instruct | 0.631 / 0.591 | 0.702 / 0.573 | 0.500 / 0.497 |
+| Qwen3-VL-8B-Instruct (FP8) | 0.508 / 0.537 | 0.698 / 0.644 | **0.398** / 0.513 |
 | *Non-vision references†* | | | |
 | Ballistic path / first-hit geometry / gap rule | 0.682 | 0.920 | 0.786 |
 | Simulator with launch noise 1 % / 0.5° | 0.993 | 0.697 | 1.000 |
 | All / none | 0.500 | 0.500 | 0.500 |
+
+95 % bootstrap intervals (over episodes), flat / cartoon:
+4B Catapult [0.60, 0.66] / [0.56, 0.62], Pool [0.62, 0.77] / [0.50, 0.65],
+Dominoes [0.49, 0.51] / [0.49, 0.50];
+8B Catapult [0.47, 0.55] / [0.50, 0.58], Pool [0.63, 0.76] / [0.57, 0.72],
+Dominoes [0.37, 0.43] / [0.49, 0.53].
 
 † Read exact launch and position numbers instead of images; the game-specific rule
 ignores most of the physics (collapses, cushion bounces and combinations, mass and
 steps). Pool's simulator row shows how unforgiving pool is: a 0.5° aim error already
 changes many outcomes.
 
-What stands out so far:
+What stands out:
 
-- **Dominoes: Qwen3-VL-4B predicts that every domino falls in 295 of 300 episodes**,
-  usually without any reasoning, and lands exactly at chance. Gaps, heavy dominoes and
-  steps are ignored.
-- **Pool is where it does best** (95 % CI 0.55–0.72 on flat), and on hard tables it beats
-  the straight-line rule (0.77 vs 0.69), which fails on bank and combination shots.
-- **Catapult**: barely above chance (95 % CI 0.52–0.59 flat).
+- **Dominoes defeats both models.** Qwen3-VL-4B answers "every domino falls" in 294 of
+  300 episodes and lands exactly at chance. Qwen3-VL-8B does worse than chance on the flat
+  style: it predicts that short, evenly spaced chains stop after the first domino (85 % of
+  those dominoes actually fall) and that long chains with gaps, heavy dominoes and steps
+  fall completely (only 30 % do). Its guesses track chain length, not gaps or mass.
+- **Pool is where vision models do best**, and on hard tables 4B beats the straight-line
+  rule (0.76 vs 0.69), which fails on bank and combination shots.
+- **Bigger is not better here:** 8B is no better than 4B on Catapult or Pool.
+- **Prompt wording matters.** Clarifying the answer format (no change to the task) moved
+  4B on Catapult from 0.55 to 0.63. All numbers above use the same prompt
+  (`physics_arcade.vlm`).
 
 Per-difficulty numbers: `physics-arcade leaderboard`. Raw model answers, including the
 reasoning text, are in [`results/v1/`](results/v1/).
