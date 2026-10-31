@@ -1,5 +1,7 @@
 # physics-arcade
 
+**English** | [简体中文](README.zh-CN.md)
+
 **Can AI models predict what happens next in simple physics games?**
 **[Leaderboard, failure gallery and a human challenge →](https://terrybtf.github.io/physics-arcade/)**
 
