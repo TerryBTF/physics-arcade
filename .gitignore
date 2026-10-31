@@ -6,3 +6,4 @@ viz/
 models/*/.venv/
 analysis/
 .claude/
+drafts/
