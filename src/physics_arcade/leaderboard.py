@@ -32,3 +32,23 @@ def outcome_table(data_dir: Path, entries: list[tuple[str, Path]]) -> str:
         f"Brier floor (perfect probabilities): {r0['brier_floor']:.3f}."
     )
     return "\n".join(lines)
+
+
+def model_row(root: Path, preds: Path, model: str, release: str = "v1") -> str:
+    """One leaderboard row for a model's six prediction files
+    (<preds>/<model>_<game>_<style>.jsonl, scored on <root>/<game>_<release>[_<style>])."""
+    from .core.benchmark import RELEASES, dataset_name
+
+    spec = RELEASES[release]
+    cells = []
+    for g in spec["games"]:
+        scores = []
+        for s in spec["styles"]:
+            path = preds / f"{model}_{g}_{s}.jsonl"
+            if not path.exists():
+                scores.append("missing")
+                continue
+            r = eval_outcome(root / dataset_name(g, s, release), path)
+            scores.append(_fmt(r["stable_balanced_accuracy"]))
+        cells.append(" / ".join(scores))
+    return f"| {model} | " + " | ".join(cells) + " |"

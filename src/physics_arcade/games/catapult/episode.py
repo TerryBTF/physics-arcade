@@ -37,7 +37,7 @@ def _snapshot(world: World) -> list[tuple[str, float, float, float]]:
 
 def _stable(before, after, tol: float = 4.0) -> bool:
     return all(
-        math.hypot(a[1] - b[1], a[2] - b[2]) < tol and abs(a[3] - b[3]) < 0.08 for a, b in zip(before, after)
+        math.hypot(a[1] - b[1], a[2] - b[2]) < tol and abs(a[3] - b[3]) < 0.08 for a, b in zip(before, after, strict=True)
     )
 
 

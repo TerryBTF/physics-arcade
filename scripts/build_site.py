@@ -56,7 +56,8 @@ def ci(answers: dict, pred_ids: dict[str, set[int]]) -> list[float]:
 def score(game: str, path: Path) -> dict:
     d = data_dir(game)
     r = eval_outcome(d, path)
-    preds = {json.loads(l)["id"]: set(json.loads(l)["ids"]) for l in path.read_text().splitlines() if l}
+    rows = [json.loads(line) for line in path.read_text().splitlines() if line]
+    preds = {r["id"]: set(r["ids"]) for r in rows}
     return {
         "overall": round(r["stable_balanced_accuracy"], 3),
         "ci": ci(load_answers(d), preds),
@@ -127,7 +128,7 @@ def model_answers(game: str) -> dict[str, dict[str, dict]]:
     out = {}
     for key, name in MODELS.items():
         rows = (ROOT / "results" / "v1" / f"{key}_{game}_cartoon.jsonl").read_text().splitlines()
-        out[name] = {r["id"]: r for r in (json.loads(l) for l in rows if l)}
+        out[name] = {r["id"]: r for r in (json.loads(line) for line in rows if line)}
     return out
 
 

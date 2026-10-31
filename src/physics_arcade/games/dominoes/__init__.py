@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from itertools import pairwise
+
 from ...core.game import Game
 from .episode import CONTEXT_FRAMES, DIFFICULTIES, TOTAL_FRAMES, generate, replay
 from .render import DYNAMIC_CLASSES, LUT_PATH, PALETTE
@@ -26,7 +28,7 @@ def _gap_rule(task: dict) -> list[int]:
     t = task["info"]["targets"]
     ids = sorted(int(k) for k in t)
     fallen = [ids[0]]
-    for a, b in zip(ids, ids[1:]):
+    for a, b in pairwise(ids):
         if t[str(b)]["x"] - t[str(a)]["x"] - DOMINO_W < t[str(a)]["h"]:
             fallen.append(b)
         else:

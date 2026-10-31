@@ -25,7 +25,7 @@ def _tower(world: World, rng: random.Random, x0: float, next_robot: list[int], d
     width = span + POST_W
     cx = x0 + width / 2
     base = GROUND_Y
-    for floor in range(floors):
+    for _ in range(floors):
         h = rng.uniform(34, 60)
         mat = _material(rng)
         for px in (cx - span / 2, cx + span / 2):

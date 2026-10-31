@@ -18,7 +18,6 @@ from pathlib import Path
 import imageio.v3 as iio
 import numpy as np
 from PIL import Image
-
 from timing import BENCH_FPS, cosmos_frame_times, to_benchmark_frames
 
 

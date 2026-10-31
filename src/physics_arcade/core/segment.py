@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import io
 from concurrent.futures import ProcessPoolExecutor
-from functools import lru_cache
+from functools import cache
 
 import imageio.v3 as iio
 import numpy as np
@@ -24,7 +24,7 @@ def _index(frame: np.ndarray) -> np.ndarray:
     return (f[..., 0].astype(np.int64) << 12) | (f[..., 1].astype(np.int64) << 6) | f[..., 2]
 
 
-@lru_cache(maxsize=None)
+@cache
 def _flat_lut(palette: tuple[tuple[int, int, int], ...]) -> np.ndarray:
     pal = np.array(palette, dtype=np.int32)
     q = np.arange(64, dtype=np.int32) * 4 + 2

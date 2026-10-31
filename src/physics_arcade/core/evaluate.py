@@ -59,8 +59,8 @@ def load_jsonl(path: Path) -> dict[str, dict]:
 
 
 def balanced_accuracy(pred: list[bool], label: list[bool]) -> float | None:
-    pos = [p for p, y in zip(pred, label) if y]
-    neg = [not p for p, y in zip(pred, label) if not y]
+    pos = [p for p, y in zip(pred, label, strict=True) if y]
+    neg = [not p for p, y in zip(pred, label, strict=True) if not y]
     if not pos or not neg:
         return None
     return (sum(pos) / len(pos) + sum(neg) / len(neg)) / 2

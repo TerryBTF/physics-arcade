@@ -1,11 +1,17 @@
 [project]
 name = "physics-arcade"
-version = "0.1.0"
-description = "Classic physics games as benchmarks for world-model physical prediction"
+version = "0.2.0"
+description = "Can AI predict what happens next? Procedurally generated physics games as a benchmark for vision-language and video world models"
 authors = [
     { name = "ruifangzhang", email = "r.zhang@student.tudelft.nl" }
 ]
 license = "MIT"
+readme = "README.md"
+keywords = ["benchmark", "physics", "vision-language-model", "world-model", "evaluation"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
 requires-python = ">=3.12"
 dependencies = [
     "imageio>=2.38.1",
@@ -16,9 +22,27 @@ dependencies = [
     "scipy>=1.18.1",
 ]
 
+[project.urls]
+Homepage = "https://terrybtf.github.io/physics-arcade/"
+Repository = "https://github.com/TerryBTF/physics-arcade"
+
+[dependency-groups]
+dev = ["pytest>=8", "ruff>=0.9"]
+
 [project.scripts]
 physics-arcade = "physics_arcade.cli:main"
 
 [build-system]
 requires = ["uv_build>=0.12.17,<0.13.0"]
 build-backend = "uv_build"
+
+[tool.ruff]
+line-length = 130
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501"]  # long lines are mostly prompt text
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

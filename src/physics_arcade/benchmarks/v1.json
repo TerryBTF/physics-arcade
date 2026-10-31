@@ -1,0 +1,32 @@
+{
+ "catapult_v1": {
+  "episodes": 300,
+  "labels": "1fb2c9fdfdd9693898f24547f474551aaec042fdbdf0a2fb330f401f4838c7d6",
+  "inputs": "8c4debb69637cc2176e9e6ce08c6e2b65f473262d8776b71c37527cc3f419043"
+ },
+ "catapult_v1_cartoon": {
+  "episodes": 300,
+  "labels": "1fb2c9fdfdd9693898f24547f474551aaec042fdbdf0a2fb330f401f4838c7d6",
+  "inputs": "15b974ef29c0c1bcd2874744e24c4499d24696dd5e8e2357af20c4ae2fb9b10a"
+ },
+ "dominoes_v1": {
+  "episodes": 300,
+  "labels": "1b8cf9d3b5287fdb02381ca6538b90fb0c049af4948ddb722a488c7ff2041cb5",
+  "inputs": "e5fe8c4a3ed60985bee85f058c5a58cbbd7e16e5bf782a10e343981ca7ee17f0"
+ },
+ "dominoes_v1_cartoon": {
+  "episodes": 300,
+  "labels": "1b8cf9d3b5287fdb02381ca6538b90fb0c049af4948ddb722a488c7ff2041cb5",
+  "inputs": "f34d82c50e672f2c56e387cbccd679787d8f7864e2f30d4f663c194af73bde02"
+ },
+ "pool_v1": {
+  "episodes": 300,
+  "labels": "3cdfbbc414f4e0acded21c7ed68292aee0883e05025852dad5d5ed870410f616",
+  "inputs": "b0ae4623c3b07901d08f404257b80593b72ba96269e1d993788934ca2bc06fac"
+ },
+ "pool_v1_cartoon": {
+  "episodes": 300,
+  "labels": "3cdfbbc414f4e0acded21c7ed68292aee0883e05025852dad5d5ed870410f616",
+  "inputs": "1b1006361fd05df85fee2a5403691204126abbf6c2931e8a5eea74fa47f3d276"
+ }
+}

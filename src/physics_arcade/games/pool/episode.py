@@ -11,8 +11,25 @@ import numpy as np
 from ...core.game import Episode
 from .render import label_balls, render, render_cartoon
 from .sim import (
-    BALL_E, BALL_R, CUSHION_E, FPS, POCKET_R, POCKETS, ROLL_DECEL, STEPS_PER_FRAME, STOP_SPEED, TABLE_X0, TABLE_X1, TABLE_Y0, TABLE_Y1,
-    Table, add_ball, max_speed, new_table, step, strike,
+    BALL_E,
+    BALL_R,
+    CUSHION_E,
+    FPS,
+    POCKET_R,
+    POCKETS,
+    ROLL_DECEL,
+    STEPS_PER_FRAME,
+    STOP_SPEED,
+    TABLE_X0,
+    TABLE_X1,
+    TABLE_Y0,
+    TABLE_Y1,
+    Table,
+    add_ball,
+    max_speed,
+    new_table,
+    step,
+    strike,
 )
 
 CONTEXT_FRAMES = 12  # 0.4 s of the cue ball rolling, before it touches anything

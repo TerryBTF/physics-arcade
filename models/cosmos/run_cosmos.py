@@ -28,7 +28,7 @@ import time
 from pathlib import Path
 
 import imageio.v3 as iio
-import numpy as np
+
 os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
 
 import torch  # noqa: E402

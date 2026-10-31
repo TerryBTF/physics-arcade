@@ -9,9 +9,9 @@ perturbations (used for probabilistic labels), and the text shown to models.
 from __future__ import annotations
 
 import random
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Callable
 
 import numpy as np
 from PIL import Image

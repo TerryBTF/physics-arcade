@@ -2,6 +2,8 @@
 
 **English** | [简体中文](README.zh-CN.md)
 
+[![CI](https://github.com/TerryBTF/physics-arcade/actions/workflows/ci.yml/badge.svg)](https://github.com/TerryBTF/physics-arcade/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](LICENSE) [![Data: CC BY 4.0](https://img.shields.io/badge/data-CC%20BY%204.0-lightgrey.svg)](LICENSE-DATA)
+
 **Can AI models predict what happens next in simple physics games?**
 **[Leaderboard, failure gallery and a human challenge →](https://terrybtf.github.io/physics-arcade/)**
 
@@ -94,9 +96,19 @@ on cartoon frames) and compared with the simulator's masks (mean IoU).
 ## Quick start
 
 ```bash
-uv sync
+pip install git+https://github.com/TerryBTF/physics-arcade   # or: git clone ... && uv sync
+physics-arcade make-benchmark --root data       # the six official v1 datasets (~15 min, ~750 MB)
+physics-arcade verify data/*_v1*                # same labels as the published leaderboard?
+```
+
+Every episode is generated deterministically from its seed, so nothing has to be
+downloaded; `verify` compares fingerprints of the labels and model inputs with the
+release.
+
+More commands:
+
+```bash
 D=data/catapult_v1
-uv run physics-arcade generate --game catapult --out $D --n 100            # add --style cartoon
 uv run physics-arcade baseline --data $D --name ballistic --out preds/ballistic.jsonl
 uv run physics-arcade eval-outcome --data $D --pred preds/ballistic.jsonl
 uv run physics-arcade leaderboard --data $D "Ballistic=preds/ballistic.jsonl"
@@ -111,7 +123,19 @@ frame with target ids) are what a model may see; `answers/` holds the hidden lab
 masks. Outcome predictions are JSON lines `{"id": ..., "ids": [targets for which the
 event happens], "p": {"<id>": probability}}` (`p` optional).
 
-## Evaluating a model
+## Evaluating a model and submitting results
+
+Write one predictions file per game and style, named `<model>_<game>_<style>.jsonl`
+(e.g. `mymodel_pool_cartoon.jsonl`), then get your leaderboard row:
+
+```bash
+physics-arcade score --model mymodel --preds path/to/predictions
+```
+
+To add a model to the leaderboard, open a pull request that adds the six files to
+`results/v1/` (keep the raw model replies in a `raw` field if you can) and a line on how
+they were produced.
+
 
 `physics_arcade.vlm` holds the shared prompt, answer parsing and a resumable loop; a
 backend only maps a list of image/text parts to a reply, so adding an API model is a few

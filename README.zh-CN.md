@@ -2,6 +2,8 @@
 
 [English](README.md) | **简体中文**
 
+[![CI](https://github.com/TerryBTF/physics-arcade/actions/workflows/ci.yml/badge.svg)](https://github.com/TerryBTF/physics-arcade/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](LICENSE) [![Data: CC BY 4.0](https://img.shields.io/badge/data-CC%20BY%204.0-lightgrey.svg)](LICENSE-DATA)
+
 **AI 能预测简单物理游戏里接下来会发生什么吗？**
 **[排行榜、翻车画廊和人机挑战 →](https://terrybtf.github.io/physics-arcade/)**
 
@@ -79,9 +81,17 @@ physics-arcade 是一组 2D 小型物理游戏构成的基准测试。模型只�
 ## 快速开始
 
 ```bash
-uv sync
+pip install git+https://github.com/TerryBTF/physics-arcade   # 或者 git clone 后 uv sync
+physics-arcade make-benchmark --root data       # 生成官方 v1 的六个数据集（约 15 分钟、750 MB）
+physics-arcade verify data/*_v1*                # 和排行榜用的是同一份标签吗？
+```
+
+每一局都由种子确定性地生成，所以不需要下载任何数据；`verify` 会把标签和模型输入的指纹与官方版本比对。
+
+更多命令：
+
+```bash
 D=data/catapult_v1
-uv run physics-arcade generate --game catapult --out $D --n 100            # 加 --style cartoon 生成卡通画风
 uv run physics-arcade baseline --data $D --name ballistic --out preds/ballistic.jsonl
 uv run physics-arcade eval-outcome --data $D --pred preds/ballistic.jsonl
 uv run physics-arcade leaderboard --data $D "Ballistic=preds/ballistic.jsonl"
@@ -95,7 +105,18 @@ uv run physics-arcade visualize --data $D --pred preds/oracle --ep hard_0003 --o
 `answers/` 存放隐藏的标签和类别图。结局预测的提交格式是 JSON Lines：
 `{"id": ..., "ids": [事件发生的目标], "p": {"<id>": 概率}}`（`p` 可选）。
 
-## 评测一个模型
+## 评测模型并提交结果
+
+每个游戏、每种画风写一个预测文件，命名为 `<模型>_<游戏>_<画风>.jsonl`（例如 `mymodel_pool_cartoon.jsonl`），
+然后一条命令得到排行榜上的一行：
+
+```bash
+physics-arcade score --model mymodel --preds path/to/predictions
+```
+
+想上排行榜的话，提一个 pull request，把这六个文件加到 `results/v1/`（最好在 `raw` 字段保留模型的原始回复），
+并简单说明是怎么跑出来的。
+
 
 `physics_arcade.vlm` 包含统一的提示词、答案解析和可断点续跑的循环；后端只需把“图像 + 文字”的列表转成回复，
 所以接入一个 API 模型只要几行代码。`models/qwen_vl/` 在本地运行 Qwen3-VL（4B 用 bf16、8B 用 FP8，

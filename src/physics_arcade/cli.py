@@ -22,6 +22,19 @@ def main() -> None:
     g.add_argument("--seed-offset", type=int, default=0)
     g.add_argument("--workers", type=int, default=8)
 
+    mb = sub.add_parser("make-benchmark", help="generate every dataset of an official release")
+    mb.add_argument("--root", type=Path, default=Path("data"))
+    mb.add_argument("--release", default="v1")
+    mb.add_argument("--game", action="append", choices=NAMES, help="only these games (repeatable)")
+    mb.add_argument("--workers", type=int, default=8)
+
+    vf = sub.add_parser("verify", help="check datasets against the official release fingerprints")
+    vf.add_argument("data", type=Path, nargs="+")
+    vf.add_argument("--release", default="v1")
+
+    fp = sub.add_parser("fingerprint", help="print a dataset's label and input fingerprints")
+    fp.add_argument("data", type=Path, nargs="+")
+
     f = sub.add_parser("fit-cartoon-lut", help="refit the color table that segments a game's cartoon frames")
     f.add_argument("--game", choices=NAMES, required=True)
     f.add_argument("--workers", type=int, default=8)
@@ -52,6 +65,12 @@ def main() -> None:
     lb.add_argument("--data", type=Path, required=True)
     lb.add_argument("entries", nargs="+", help="NAME=path/to/predictions.jsonl")
 
+    sc = sub.add_parser("score", help="leaderboard row (flat / cartoon per game) for one model's prediction files")
+    sc.add_argument("--model", required=True, help="prefix of <model>_<game>_<style>.jsonl")
+    sc.add_argument("--preds", type=Path, default=Path("results/v1"))
+    sc.add_argument("--root", type=Path, default=Path("data"), help="where make-benchmark wrote the datasets")
+    sc.add_argument("--release", default="v1")
+
     b = sub.add_parser("baseline", help="write baseline predictions (all, none, game-specific, copy_last, oracle)")
     b.add_argument("--data", type=Path, required=True)
     b.add_argument("--name", required=True)
@@ -64,6 +83,25 @@ def main() -> None:
         game = get_game(args.game)
         write_dataset(game, args.out, args.n, args.style, args.workers, args.seed_offset)
         print(f"wrote {args.n * len(game.difficulties)} {args.game} episodes to {args.out}")
+    elif args.cmd == "make-benchmark":
+        from .core.benchmark import make
+
+        for d in make(args.root, args.release, args.workers, args.game):
+            print(f"wrote {d}")
+    elif args.cmd == "verify":
+        from .core.benchmark import verify
+
+        results = [verify(d, args.release) for d in args.data]
+        for r in results:
+            status = "OK" if r["labels_match"] else "MISMATCH"
+            note = "" if r["inputs_match"] else " (input pixels differ slightly; labels are what scoring uses)"
+            print(f"{status:8s} {r['dataset']} ({r['episodes']} episodes){note}")
+        if not all(r["labels_match"] for r in results):
+            raise SystemExit(1)
+    elif args.cmd == "fingerprint":
+        from .core.fingerprint import fingerprint
+
+        print(json.dumps({d.name: fingerprint(d) for d in args.data}, indent=1))
     elif args.cmd == "fit-cartoon-lut":
         from .core.segment import fit_cartoon_lut
 
@@ -90,6 +128,10 @@ def main() -> None:
 
         entries = [(e.split("=", 1)[0], Path(e.split("=", 1)[1])) for e in args.entries]
         print(outcome_table(args.data, entries))
+    elif args.cmd == "score":
+        from .leaderboard import model_row
+
+        print(model_row(args.root, args.preds, args.model, args.release))
     elif args.cmd == "baseline":
         from .core.baselines import run_baseline
 

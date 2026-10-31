@@ -86,7 +86,7 @@ def render_cartoon(scene: Scene) -> Image.Image:
         c = CARTOON[dm.material]
         w, h = dm.size
 
-        def box(x0, y0, x1, y1, fill):
+        def box(x0, y0, x1, y1, fill, dm=dm):
             d.polygon([_flip(*dm.body.local_to_world(p), s) for p in [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]], fill=fill)
 
         box(-w / 2, -h / 2, w / 2, h / 2, c["edge"])

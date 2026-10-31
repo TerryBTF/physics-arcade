@@ -10,7 +10,20 @@ import numpy as np
 
 from ...core.game import Episode
 from .render import label_dominoes, render, render_cartoon
-from .sim import FLOOR_Y, FPS, GRAVITY, STEPS_PER_FRAME, WIDTH, Scene, add_domino, add_platform, max_speed, new_scene, step, toss_ball
+from .sim import (
+    FLOOR_Y,
+    FPS,
+    GRAVITY,
+    STEPS_PER_FRAME,
+    WIDTH,
+    Scene,
+    add_domino,
+    add_platform,
+    max_speed,
+    new_scene,
+    step,
+    toss_ball,
+)
 
 CONTEXT_FRAMES = 12  # 0.4 s of the ball in flight
 TOTAL_FRAMES = 180  # 6 s
@@ -82,7 +95,7 @@ def setups(seed: int, difficulty: str, max_tries: int = 80):
         start = [tuple(d.body.position) for d in scene.dominoes]
         for _ in range(FPS * STEPS_PER_FRAME):  # 1 s settle: the chain must stand on its own
             step(scene)
-        if any(math.dist(a, tuple(d.body.position)) > 1.0 or d.fallen() for a, d in zip(start, scene.dominoes)):
+        if any(math.dist(a, tuple(d.body.position)) > 1.0 or d.fallen() for a, d in zip(start, scene.dominoes, strict=True)):
             continue
         scene.time = 0.0
         yield Setup(attempt, scene, *_toss(rng, scene))
