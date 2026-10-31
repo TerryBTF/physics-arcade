@@ -5,6 +5,7 @@ description = "Classic physics games as benchmarks for world-model physical pred
 authors = [
     { name = "ruifangzhang", email = "r.zhang@student.tudelft.nl" }
 ]
+license = "MIT"
 requires-python = ">=3.12"
 dependencies = [
     "imageio>=2.38.1",

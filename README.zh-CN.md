@@ -121,3 +121,7 @@ Hugging Face 上获得 Cosmos 和安全过滤仓库的访问权限）。`models/
 一个游戏就是一个 `physics_arcade.core.game.Game`：物理、扁平和卡通两种渲染、按难度生成关卡、可接受扰动的
 确定性 `replay`，以及题目文字。数据集写入、标签、评分、类别切分、可视化和 VLM 评测框架都是共用的。
 现有的三个游戏见 `src/physics_arcade/games/`。
+
+## 许可证
+
+代码：[MIT](LICENSE)。数据集、模型结果、图片和视频：[CC BY 4.0](LICENSE-DATA)。

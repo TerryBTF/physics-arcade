@@ -140,3 +140,7 @@ A game is a `physics_arcade.core.game.Game`: physics, a flat and a cartoon rende
 level generator per difficulty, a deterministic `replay` that accepts perturbations, and
 the question text. Dataset writing, labels, scoring, segmentation, visualization and the
 VLM harness are shared. See `src/physics_arcade/games/` for the three existing games.
+
+## License
+
+Code: [MIT](LICENSE). Datasets, model results, images and videos: [CC BY 4.0](LICENSE-DATA).
