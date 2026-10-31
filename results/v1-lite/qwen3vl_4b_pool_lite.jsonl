@@ -1,0 +1,50 @@
+{"id": "easy_0002", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [1], \"p_potted\": {\"1\": 1.0}}", "seconds": 0.5, "ids": [1], "p": {"1": 1.0}}
+{"id": "easy_0005", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [], \"p_potted\": {}}", "seconds": 0.4, "ids": []}
+{"id": "easy_0008", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [], \"p_potted\": {}}", "seconds": 0.4, "ids": []}
+{"id": "easy_0011", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [2], \"p_potted\": {\"2\": 1.0}}", "seconds": 0.5, "ids": [2], "p": {"2": 1.0}}
+{"id": "easy_0027", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [1], \"p_potted\": {\"1\": 1.0}}", "seconds": 0.5, "ids": [1], "p": {"1": 1.0}}
+{"id": "easy_0032", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [], \"p_potted\": {}}", "seconds": 0.4, "ids": []}
+{"id": "easy_0037", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [], \"p_potted\": {}}", "seconds": 0.4, "ids": []}
+{"id": "easy_0045", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [], \"p_potted\": {}}", "seconds": 0.4, "ids": []}
+{"id": "easy_0051", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [1], \"p_potted\": {\"1\": 1.0}}", "seconds": 0.5, "ids": [1], "p": {"1": 1.0}}
+{"id": "easy_0053", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [2], \"p_potted\": {\"2\": 1.0}}", "seconds": 0.5, "ids": [2], "p": {"2": 1.0}}
+{"id": "easy_0068", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [1], \"p_potted\": {\"1\": 1.0}}", "seconds": 0.5, "ids": [1], "p": {"1": 1.0}}
+{"id": "easy_0077", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [2], \"p_potted\": {\"2\": 1.0}}", "seconds": 0.5, "ids": [2], "p": {"2": 1.0}}
+{"id": "easy_0083", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [], \"p_potted\": {}}", "seconds": 0.4, "ids": []}
+{"id": "easy_0085", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [1], \"p_potted\": {\"1\": 1.0}}", "seconds": 0.5, "ids": [1], "p": {"1": 1.0}}
+{"id": "easy_0089", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [2], \"p_potted\": {\"2\": 1.0}}", "seconds": 0.5, "ids": [2], "p": {"2": 1.0}}
+{"id": "easy_0091", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [], \"p_potted\": {}}", "seconds": 0.4, "ids": []}
+{"id": "easy_0097", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [1], \"p_potted\": {\"1\": 1.0}}", "seconds": 0.5, "ids": [1], "p": {"1": 1.0}}
+{"id": "medium_0004", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [1], \"p_potted\": {\"1\": 1.0}}", "seconds": 0.5, "ids": [1], "p": {"1": 1.0}}
+{"id": "medium_0005", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [4], \"p_potted\": {\"4\": 1.0}}", "seconds": 0.5, "ids": [4], "p": {"4": 1.0}}
+{"id": "medium_0008", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [2], \"p_potted\": {\"2\": 1.0}}", "seconds": 0.5, "ids": [2], "p": {"2": 1.0}}
+{"id": "medium_0011", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [3], \"p_potted\": {\"3\": 1.0}}", "seconds": 0.5, "ids": [3], "p": {"3": 1.0}}
+{"id": "medium_0016", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [5], \"p_potted\": {\"5\": 1.0}}", "seconds": 0.5, "ids": [5], "p": {"5": 1.0}}
+{"id": "medium_0018", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [1, 2, 3, 4, 5], \"p_potted\": {\"1\": 1.0, \"2\": 1.0, \"3\": 1.0, \"4\": 1.0, \"5\": 1.0}}", "seconds": 1.2, "ids": [1, 2, 3, 4, 5], "p": {"1": 1.0, "2": 1.0, "3": 1.0, "4": 1.0, "5": 1.0}}
+{"id": "medium_0035", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [1], \"p_potted\": {\"1\": 1.0}}", "seconds": 0.5, "ids": [1], "p": {"1": 1.0}}
+{"id": "medium_0039", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [3], \"p_potted\": {\"3\": 1.0}}", "seconds": 0.5, "ids": [3], "p": {"3": 1.0}}
+{"id": "medium_0053", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [1], \"p_potted\": {\"1\": 1.0}}", "seconds": 0.5, "ids": [1], "p": {"1": 1.0}}
+{"id": "medium_0058", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [3], \"p_potted\": {\"3\": 1.0}}", "seconds": 0.5, "ids": [3], "p": {"3": 1.0}}
+{"id": "medium_0065", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [2], \"p_potted\": {\"2\": 1.0}}", "seconds": 0.5, "ids": [2], "p": {"2": 1.0}}
+{"id": "medium_0066", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [2], \"p_potted\": {\"2\": 1.0}}", "seconds": 0.5, "ids": [2], "p": {"2": 1.0}}
+{"id": "medium_0068", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [3], \"p_potted\": {\"3\": 1.0}}", "seconds": 0.5, "ids": [3], "p": {"3": 1.0}}
+{"id": "medium_0070", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [3], \"p_potted\": {\"3\": 1.0}}", "seconds": 0.5, "ids": [3], "p": {"3": 1.0}}
+{"id": "medium_0071", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [3], \"p_potted\": {\"3\": 1.0}}", "seconds": 0.5, "ids": [3], "p": {"3": 1.0}}
+{"id": "medium_0087", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [1], \"p_potted\": {\"1\": 1.0}}", "seconds": 0.5, "ids": [1], "p": {"1": 1.0}}
+{"id": "medium_0090", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [1], \"p_potted\": {\"1\": 1.0}}", "seconds": 0.5, "ids": [1], "p": {"1": 1.0}}
+{"id": "hard_0003", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [8, 9], \"p_potted\": {\"8\": 1.0, \"9\": 1.0}}", "seconds": 0.7, "ids": [8, 9], "p": {"8": 1.0, "9": 1.0}}
+{"id": "hard_0006", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [7, 8], \"p_potted\": {\"7\": 1.0, \"8\": 1.0}}", "seconds": 0.7, "ids": [7, 8], "p": {"7": 1.0, "8": 1.0}}
+{"id": "hard_0027", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [7], \"p_potted\": {\"7\": 1.0}}", "seconds": 0.5, "ids": [7], "p": {"7": 1.0}}
+{"id": "hard_0032", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [7, 8], \"p_potted\": {\"7\": 1.0, \"8\": 1.0}}", "seconds": 0.7, "ids": [7, 8], "p": {"7": 1.0, "8": 1.0}}
+{"id": "hard_0033", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [7, 8], \"p_potted\": {\"7\": 1.0, \"8\": 1.0}}", "seconds": 0.7, "ids": [7, 8], "p": {"7": 1.0, "8": 1.0}}
+{"id": "hard_0041", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [7, 8], \"p_potted\": {\"7\": 1.0, \"8\": 1.0}}", "seconds": 0.7, "ids": [7, 8], "p": {"7": 1.0, "8": 1.0}}
+{"id": "hard_0045", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [7, 8], \"p_potted\": {\"7\": 1.0, \"8\": 1.0}}", "seconds": 0.7, "ids": [7, 8], "p": {"7": 1.0, "8": 1.0}}
+{"id": "hard_0056", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [3, 4, 5, 6, 7], \"p_potted\": {\"3\": 1.0, \"4\": 1.0, \"5\": 1.0, \"6\": 1.0, \"7\": 1.0}}", "seconds": 1.2, "ids": [3, 4, 5, 6, 7], "p": {"3": 1.0, "4": 1.0, "5": 1.0, "6": 1.0, "7": 1.0}}
+{"id": "hard_0058", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [7], \"p_potted\": {\"7\": 1.0}}", "seconds": 0.5, "ids": [7], "p": {"7": 1.0}}
+{"id": "hard_0066", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [9], \"p_potted\": {\"9\": 1.0}}", "seconds": 0.5, "ids": [9], "p": {"9": 1.0}}
+{"id": "hard_0067", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [8, 9], \"p_potted\": {\"8\": 1.0, \"9\": 1.0}}", "seconds": 0.7, "ids": [8, 9], "p": {"8": 1.0, "9": 1.0}}
+{"id": "hard_0083", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [7, 8], \"p_potted\": {\"7\": 1.0, \"8\": 1.0}}", "seconds": 0.7, "ids": [7, 8], "p": {"7": 1.0, "8": 1.0}}
+{"id": "hard_0085", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [7, 8], \"p_potted\": {\"7\": 1.0, \"8\": 1.0}}", "seconds": 0.7, "ids": [7, 8], "p": {"7": 1.0, "8": 1.0}}
+{"id": "hard_0093", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [8, 9], \"p_potted\": {\"8\": 1.0, \"9\": 1.0}}", "seconds": 0.7, "ids": [8, 9], "p": {"8": 1.0, "9": 1.0}}
+{"id": "hard_0094", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [1, 2, 3, 4, 5, 6, 7, 8, 9], \"p_potted\": {\"1\": 1.0, \"2\": 1.0, \"3\": 1.0, \"4\": 1.0, \"5\": 1.0, \"6\": 1.0, \"7\": 1.0, \"8\": 1.0, \"9\": 1.0}}", "seconds": 1.8, "ids": [1, 2, 3, 4, 5, 6, 7, 8, 9], "p": {"1": 1.0, "2": 1.0, "3": 1.0, "4": 1.0, "5": 1.0, "6": 1.0, "7": 1.0, "8": 1.0, "9": 1.0}}
+{"id": "hard_0098", "model": "Qwen/Qwen3-VL-4B-Instruct", "raw": "{\"potted\": [9], \"p_potted\": {\"9\": 1.0}}", "seconds": 0.5, "ids": [9], "p": {"9": 1.0}}

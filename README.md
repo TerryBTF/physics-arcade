@@ -101,6 +101,10 @@ physics-arcade make-benchmark --root data       # the six official v1 datasets (
 physics-arcade verify data/*_v1*                # same labels as the published leaderboard?
 ```
 
+For expensive models there is **v1-lite**: a fixed, stratified 150-episode subset of the
+cartoon datasets (50 per game), built with `physics-arcade make-benchmark --release v1-lite`
+after the v1 datasets; score it with `score --release v1-lite` on `<model>_<game>_lite.jsonl`.
+
 Every episode is generated deterministically from its seed, so nothing has to be
 downloaded; `verify` compares fingerprints of the labels and model inputs with the
 release.
@@ -146,6 +150,10 @@ cd models/qwen_vl && ./setup.sh
 .venv/bin/python run_qwen_vl.py --model Qwen/Qwen3-VL-8B-Instruct-FP8 \
     --data ../../data/catapult_v1 --out ../../preds/qwen3vl_8b_catapult.jsonl
 ```
+
+`models/gemini/` runs Google Gemini through the same harness (API key from the
+`GEMINI_API_KEY` environment variable; `--rpm` for free-tier rate limits; token usage is
+logged so `cost.py` can price a run).
 
 `models/cosmos/` runs NVIDIA Cosmos-Predict2-2B-Video2World for the rollout track
 (Catapult prompts; needs Hugging Face access to the gated Cosmos and guardrail repos).

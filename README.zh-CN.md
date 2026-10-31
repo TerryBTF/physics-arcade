@@ -86,6 +86,10 @@ physics-arcade make-benchmark --root data       # 生成官方 v1 的六个数�
 physics-arcade verify data/*_v1*                # 和排行榜用的是同一份标签吗？
 ```
 
+对于调用费用高的模型，有一个 **v1-lite** 精简子集：从卡通数据集中按难度分层固定抽取的 150 局（每个游戏 50 局），
+生成完 v1 后用 `physics-arcade make-benchmark --release v1-lite` 得到；预测文件命名为 `<模型>_<游戏>_lite.jsonl`，
+用 `score --release v1-lite` 打分。
+
 每一局都由种子确定性地生成，所以不需要下载任何数据；`verify` 会把标签和模型输入的指纹与官方版本比对。
 
 更多命令：
@@ -127,6 +131,9 @@ cd models/qwen_vl && ./setup.sh
 .venv/bin/python run_qwen_vl.py --model Qwen/Qwen3-VL-8B-Instruct-FP8 \
     --data ../../data/catapult_v1 --out ../../preds/qwen3vl_8b_catapult.jsonl
 ```
+
+`models/gemini/` 通过同一套框架调用 Google Gemini（API key 从环境变量 `GEMINI_API_KEY` 读取；免费额度用 `--rpm`
+限速；每次调用的 token 用量都会记录，可以用 `cost.py` 算出花费）。
 
 `models/cosmos/` 用 NVIDIA Cosmos-Predict2-2B-Video2World 跑视频推演赛道（目前只有投石机的提示词；需要在
 Hugging Face 上获得 Cosmos 和安全过滤仓库的访问权限）。`models/cosmos/dry_run.py` 把真实视频送进同样的
