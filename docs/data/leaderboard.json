@@ -1,0 +1,494 @@
+{
+ "games": [
+  {
+   "name": "catapult",
+   "title": "Catapult",
+   "question": "Which robots are still alive after the cannonball's impact, once everything has come to rest?",
+   "target": "robot",
+   "event": "alive"
+  },
+  {
+   "name": "pool",
+   "title": "Pool",
+   "question": "Which numbered balls end up in a pocket once everything has stopped?",
+   "target": "ball",
+   "event": "potted"
+  },
+  {
+   "name": "dominoes",
+   "title": "Dominoes",
+   "question": "Which dominoes have fallen once everything has come to rest?",
+   "target": "domino",
+   "event": "fallen"
+  }
+ ],
+ "styles": [
+  "flat",
+  "cartoon"
+ ],
+ "difficulties": [
+  "easy",
+  "medium",
+  "hard"
+ ],
+ "entries": [
+  {
+   "name": "Qwen3-VL-4B-Instruct",
+   "kind": "vlm",
+   "results": {
+    "catapult": {
+     "flat": {
+      "overall": 0.631,
+      "ci": [
+       0.601,
+       0.663
+      ],
+      "brier": 0.331,
+      "tiers": {
+       "easy": 0.697,
+       "medium": 0.618,
+       "hard": 0.579
+      }
+     },
+     "cartoon": {
+      "overall": 0.591,
+      "ci": [
+       0.56,
+       0.621
+      ],
+      "brier": 0.34,
+      "tiers": {
+       "easy": 0.69,
+       "medium": 0.515,
+       "hard": 0.595
+      }
+     }
+    },
+    "pool": {
+     "flat": {
+      "overall": 0.702,
+      "ci": [
+       0.621,
+       0.774
+      ],
+      "brier": 0.324,
+      "tiers": {
+       "easy": 0.64,
+       "medium": 0.615,
+       "hard": 0.76
+      }
+     },
+     "cartoon": {
+      "overall": 0.573,
+      "ci": [
+       0.497,
+       0.65
+      ],
+      "brier": 0.305,
+      "tiers": {
+       "easy": 0.468,
+       "medium": 0.576,
+       "hard": 0.747
+      }
+     }
+    },
+    "dominoes": {
+     "flat": {
+      "overall": 0.5,
+      "ci": [
+       0.493,
+       0.506
+      ],
+      "brier": 0.529,
+      "tiers": {
+       "easy": 0.5,
+       "medium": 0.494,
+       "hard": 0.501
+      }
+     },
+     "cartoon": {
+      "overall": 0.497,
+      "ci": [
+       0.491,
+       0.501
+      ],
+      "brier": 0.532,
+      "tiers": {
+       "easy": 0.5,
+       "medium": 0.501,
+       "hard": 0.489
+      }
+     }
+    }
+   }
+  },
+  {
+   "name": "Qwen3-VL-8B-Instruct (FP8)",
+   "kind": "vlm",
+   "results": {
+    "catapult": {
+     "flat": {
+      "overall": 0.508,
+      "ci": [
+       0.473,
+       0.545
+      ],
+      "brier": 0.449,
+      "tiers": {
+       "easy": 0.537,
+       "medium": 0.429,
+       "hard": 0.54
+      }
+     },
+     "cartoon": {
+      "overall": 0.537,
+      "ci": [
+       0.502,
+       0.575
+      ],
+      "brier": 0.456,
+      "tiers": {
+       "easy": 0.556,
+       "medium": 0.509,
+       "hard": 0.56
+      }
+     }
+    },
+    "pool": {
+     "flat": {
+      "overall": 0.698,
+      "ci": [
+       0.628,
+       0.761
+      ],
+      "brier": 0.372,
+      "tiers": {
+       "easy": 0.561,
+       "medium": 0.557,
+       "hard": 0.598
+      }
+     },
+     "cartoon": {
+      "overall": 0.644,
+      "ci": [
+       0.565,
+       0.715
+      ],
+      "brier": 0.178,
+      "tiers": {
+       "easy": 0.545,
+       "medium": 0.579,
+       "hard": 0.491
+      }
+     }
+    },
+    "dominoes": {
+     "flat": {
+      "overall": 0.398,
+      "ci": [
+       0.365,
+       0.43
+      ],
+      "brier": 0.607,
+      "tiers": {
+       "easy": 0.574,
+       "medium": 0.474,
+       "hard": 0.509
+      }
+     },
+     "cartoon": {
+      "overall": 0.513,
+      "ci": [
+       0.491,
+       0.533
+      ],
+      "brier": 0.521,
+      "tiers": {
+       "easy": 0.546,
+       "medium": 0.49,
+       "hard": 0.508
+      }
+     }
+    }
+   }
+  },
+  {
+   "name": "Game-specific rule",
+   "kind": "reference",
+   "note": "Reads exact launch and positions instead of images; ignores most of the physics.",
+   "results": {
+    "catapult": {
+     "flat": {
+      "overall": 0.682,
+      "ci": [
+       0.654,
+       0.71
+      ],
+      "brier": 0.377,
+      "tiers": {
+       "easy": 0.691,
+       "medium": 0.714,
+       "hard": 0.644
+      }
+     },
+     "cartoon": {
+      "overall": 0.682,
+      "ci": [
+       0.654,
+       0.71
+      ],
+      "brier": 0.377,
+      "tiers": {
+       "easy": 0.691,
+       "medium": 0.714,
+       "hard": 0.644
+      }
+     }
+    },
+    "pool": {
+     "flat": {
+      "overall": 0.92,
+      "ci": [
+       0.857,
+       0.972
+      ],
+      "brier": 0.044,
+      "tiers": {
+       "easy": 0.995,
+       "medium": 0.944,
+       "hard": 0.686
+      }
+     },
+     "cartoon": {
+      "overall": 0.92,
+      "ci": [
+       0.857,
+       0.972
+      ],
+      "brier": 0.044,
+      "tiers": {
+       "easy": 0.995,
+       "medium": 0.944,
+       "hard": 0.686
+      }
+     }
+    },
+    "dominoes": {
+     "flat": {
+      "overall": 0.786,
+      "ci": [
+       0.752,
+       0.819
+      ],
+      "brier": 0.232,
+      "tiers": {
+       "easy": 0.904,
+       "medium": 0.795,
+       "hard": 0.775
+      }
+     },
+     "cartoon": {
+      "overall": 0.786,
+      "ci": [
+       0.752,
+       0.819
+      ],
+      "brier": 0.232,
+      "tiers": {
+       "easy": 0.904,
+       "medium": 0.795,
+       "hard": 0.775
+      }
+     }
+    }
+   },
+   "names": {
+    "catapult": "Ballistic path",
+    "pool": "First-hit geometry",
+    "dominoes": "Gap rule"
+   }
+  },
+  {
+   "name": "Simulator, launch noise 1 % / 0.5\u00b0",
+   "kind": "reference",
+   "note": "The real physics engine fed a slightly wrong launch: what a near-perfect visual estimate allows.",
+   "results": {
+    "catapult": {
+     "flat": {
+      "overall": 0.993,
+      "ci": [
+       0.98,
+       1.0
+      ],
+      "brier": 0.044,
+      "tiers": {
+       "easy": 0.991,
+       "medium": 1.0,
+       "hard": 0.991
+      }
+     },
+     "cartoon": {
+      "overall": 0.993,
+      "ci": [
+       0.98,
+       1.0
+      ],
+      "brier": 0.044,
+      "tiers": {
+       "easy": 0.991,
+       "medium": 1.0,
+       "hard": 0.991
+      }
+     }
+    },
+    "pool": {
+     "flat": {
+      "overall": 0.697,
+      "ci": [
+       0.625,
+       0.778
+      ],
+      "brier": 0.042,
+      "tiers": {
+       "easy": 0.762,
+       "medium": 0.611,
+       "hard": 0.625
+      }
+     },
+     "cartoon": {
+      "overall": 0.697,
+      "ci": [
+       0.625,
+       0.778
+      ],
+      "brier": 0.042,
+      "tiers": {
+       "easy": 0.762,
+       "medium": 0.611,
+       "hard": 0.625
+      }
+     }
+    },
+    "dominoes": {
+     "flat": {
+      "overall": 1.0,
+      "ci": [
+       1.0,
+       1.0
+      ],
+      "brier": 0.013,
+      "tiers": {
+       "easy": 1.0,
+       "medium": 1.0,
+       "hard": 1.0
+      }
+     },
+     "cartoon": {
+      "overall": 1.0,
+      "ci": [
+       1.0,
+       1.0
+      ],
+      "brier": 0.013,
+      "tiers": {
+       "easy": 1.0,
+       "medium": 1.0,
+       "hard": 1.0
+      }
+     }
+    }
+   }
+  },
+  {
+   "name": "Always \"yes\"",
+   "kind": "reference",
+   "note": "Says the event happens to every target.",
+   "results": {
+    "catapult": {
+     "flat": {
+      "overall": 0.5,
+      "ci": [
+       0.5,
+       0.5
+      ],
+      "brier": 0.588,
+      "tiers": {
+       "easy": 0.5,
+       "medium": 0.5,
+       "hard": 0.5
+      }
+     },
+     "cartoon": {
+      "overall": 0.5,
+      "ci": [
+       0.5,
+       0.5
+      ],
+      "brier": 0.588,
+      "tiers": {
+       "easy": 0.5,
+       "medium": 0.5,
+       "hard": 0.5
+      }
+     }
+    },
+    "pool": {
+     "flat": {
+      "overall": 0.5,
+      "ci": [
+       0.5,
+       0.5
+      ],
+      "brier": 0.924,
+      "tiers": {
+       "easy": 0.5,
+       "medium": 0.5,
+       "hard": 0.5
+      }
+     },
+     "cartoon": {
+      "overall": 0.5,
+      "ci": [
+       0.5,
+       0.5
+      ],
+      "brier": 0.924,
+      "tiers": {
+       "easy": 0.5,
+       "medium": 0.5,
+       "hard": 0.5
+      }
+     }
+    },
+    "dominoes": {
+     "flat": {
+      "overall": 0.5,
+      "ci": [
+       0.5,
+       0.5
+      ],
+      "brier": 0.53,
+      "tiers": {
+       "easy": 0.5,
+       "medium": 0.5,
+       "hard": 0.5
+      }
+     },
+     "cartoon": {
+      "overall": 0.5,
+      "ci": [
+       0.5,
+       0.5
+      ],
+      "brier": 0.53,
+      "tiers": {
+       "easy": 0.5,
+       "medium": 0.5,
+       "hard": 0.5
+      }
+     }
+    }
+   }
+  }
+ ]
+}

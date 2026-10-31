@@ -1,0 +1,1453 @@
+{
+ "rounds": [
+  {
+   "game": "catapult",
+   "id": "easy_0035",
+   "difficulty": "easy",
+   "still": "media/episodes/catapult_easy_0035_labeled.png",
+   "context": "media/episodes/catapult_easy_0035_context.mp4",
+   "outcome": "media/episodes/catapult_easy_0035_outcome.mp4",
+   "targets": [
+    {
+     "id": 1,
+     "x": 450.9,
+     "y": 310.0,
+     "w": 30.0,
+     "h": 30.0
+    },
+    {
+     "id": 2,
+     "x": 444.0,
+     "y": 260.1,
+     "w": 30.0,
+     "h": 30.0
+    },
+    {
+     "id": 3,
+     "x": 515.1,
+     "y": 310.1,
+     "w": 30.0,
+     "h": 30.0
+    }
+   ],
+   "truth": [
+    1,
+    3
+   ],
+   "models": {
+    "Qwen3-VL-4B-Instruct": [
+     3
+    ],
+    "Qwen3-VL-8B-Instruct (FP8)": [
+     1,
+     3
+    ]
+   }
+  },
+  {
+   "game": "catapult",
+   "id": "easy_0040",
+   "difficulty": "easy",
+   "still": "media/episodes/catapult_easy_0040_labeled.png",
+   "context": "media/episodes/catapult_easy_0040_context.mp4",
+   "outcome": "media/episodes/catapult_easy_0040_outcome.mp4",
+   "targets": [
+    {
+     "id": 1,
+     "x": 466.6,
+     "y": 311.6,
+     "w": 26.8,
+     "h": 26.8
+    },
+    {
+     "id": 2,
+     "x": 556.8,
+     "y": 309.7,
+     "w": 30.6,
+     "h": 30.6
+    }
+   ],
+   "truth": [
+    1
+   ],
+   "models": {
+    "Qwen3-VL-4B-Instruct": [
+     2
+    ],
+    "Qwen3-VL-8B-Instruct (FP8)": [
+     1,
+     2
+    ]
+   }
+  },
+  {
+   "game": "catapult",
+   "id": "medium_0072",
+   "difficulty": "medium",
+   "still": "media/episodes/catapult_medium_0072_labeled.png",
+   "context": "media/episodes/catapult_medium_0072_context.mp4",
+   "outcome": "media/episodes/catapult_medium_0072_outcome.mp4",
+   "targets": [
+    {
+     "id": 1,
+     "x": 359.1,
+     "y": 310.5,
+     "w": 29.0,
+     "h": 29.0
+    },
+    {
+     "id": 2,
+     "x": 357.2,
+     "y": 255.0,
+     "w": 30.8,
+     "h": 30.8
+    },
+    {
+     "id": 3,
+     "x": 354.0,
+     "y": 144.6,
+     "w": 33.6,
+     "h": 33.6
+    },
+    {
+     "id": 4,
+     "x": 420.2,
+     "y": 285.8,
+     "w": 26.4,
+     "h": 26.4
+    }
+   ],
+   "truth": [
+    4
+   ],
+   "models": {
+    "Qwen3-VL-4B-Instruct": [
+     1,
+     2,
+     3,
+     4
+    ],
+    "Qwen3-VL-8B-Instruct (FP8)": [
+     1,
+     2,
+     4
+    ]
+   }
+  },
+  {
+   "game": "catapult",
+   "id": "medium_0075",
+   "difficulty": "medium",
+   "still": "media/episodes/catapult_medium_0075_labeled.png",
+   "context": "media/episodes/catapult_medium_0075_context.mp4",
+   "outcome": "media/episodes/catapult_medium_0075_outcome.mp4",
+   "targets": [
+    {
+     "id": 1,
+     "x": 388.0,
+     "y": 287.6,
+     "w": 27.6,
+     "h": 27.6
+    },
+    {
+     "id": 2,
+     "x": 436.8,
+     "y": 270.9,
+     "w": 26.4,
+     "h": 26.4
+    }
+   ],
+   "truth": [],
+   "models": {
+    "Qwen3-VL-4B-Instruct": [
+     2
+    ],
+    "Qwen3-VL-8B-Instruct (FP8)": [
+     2
+    ]
+   }
+  },
+  {
+   "game": "catapult",
+   "id": "medium_0093",
+   "difficulty": "medium",
+   "still": "media/episodes/catapult_medium_0093_labeled.png",
+   "context": "media/episodes/catapult_medium_0093_context.mp4",
+   "outcome": "media/episodes/catapult_medium_0093_outcome.mp4",
+   "targets": [
+    {
+     "id": 1,
+     "x": 364.2,
+     "y": 309.5,
+     "w": 31.0,
+     "h": 31.0
+    },
+    {
+     "id": 2,
+     "x": 443.6,
+     "y": 282.2,
+     "w": 27.0,
+     "h": 27.0
+    }
+   ],
+   "truth": [
+    2
+   ],
+   "models": {
+    "Qwen3-VL-4B-Instruct": [
+     1
+    ],
+    "Qwen3-VL-8B-Instruct (FP8)": [
+     2
+    ]
+   }
+  },
+  {
+   "game": "catapult",
+   "id": "hard_0009",
+   "difficulty": "hard",
+   "still": "media/episodes/catapult_hard_0009_labeled.png",
+   "context": "media/episodes/catapult_hard_0009_context.mp4",
+   "outcome": "media/episodes/catapult_hard_0009_outcome.mp4",
+   "targets": [
+    {
+     "id": 1,
+     "x": 367.1,
+     "y": 309.3,
+     "w": 31.4,
+     "h": 31.4
+    },
+    {
+     "id": 2,
+     "x": 446.3,
+     "y": 242.3,
+     "w": 26.4,
+     "h": 26.4
+    },
+    {
+     "id": 3,
+     "x": 446.4,
+     "y": 139.0,
+     "w": 29.6,
+     "h": 29.6
+    },
+    {
+     "id": 4,
+     "x": 514.5,
+     "y": 274.9,
+     "w": 27.6,
+     "h": 27.6
+    }
+   ],
+   "truth": [
+    1,
+    4
+   ],
+   "models": {
+    "Qwen3-VL-4B-Instruct": [
+     1,
+     4
+    ],
+    "Qwen3-VL-8B-Instruct (FP8)": [
+     4
+    ]
+   }
+  },
+  {
+   "game": "catapult",
+   "id": "hard_0088",
+   "difficulty": "hard",
+   "still": "media/episodes/catapult_hard_0088_labeled.png",
+   "context": "media/episodes/catapult_hard_0088_context.mp4",
+   "outcome": "media/episodes/catapult_hard_0088_outcome.mp4",
+   "targets": [
+    {
+     "id": 1,
+     "x": 351.1,
+     "y": 257.1,
+     "w": 28.4,
+     "h": 28.4
+    },
+    {
+     "id": 2,
+     "x": 440.4,
+     "y": 252.7,
+     "w": 32.0,
+     "h": 32.0
+    },
+    {
+     "id": 3,
+     "x": 444.2,
+     "y": 188.4,
+     "w": 29.6,
+     "h": 29.6
+    },
+    {
+     "id": 4,
+     "x": 515.3,
+     "y": 289.6,
+     "w": 30.6,
+     "h": 30.6
+    }
+   ],
+   "truth": [
+    2,
+    3,
+    4
+   ],
+   "models": {
+    "Qwen3-VL-4B-Instruct": [
+     1,
+     2,
+     3,
+     4
+    ],
+    "Qwen3-VL-8B-Instruct (FP8)": [
+     1,
+     2,
+     3,
+     4
+    ]
+   }
+  },
+  {
+   "game": "catapult",
+   "id": "hard_0099",
+   "difficulty": "hard",
+   "still": "media/episodes/catapult_hard_0099_labeled.png",
+   "context": "media/episodes/catapult_hard_0099_context.mp4",
+   "outcome": "media/episodes/catapult_hard_0099_outcome.mp4",
+   "targets": [
+    {
+     "id": 1,
+     "x": 359.8,
+     "y": 309.2,
+     "w": 31.6,
+     "h": 31.6
+    },
+    {
+     "id": 2,
+     "x": 469.9,
+     "y": 282.2,
+     "w": 31.6,
+     "h": 31.6
+    },
+    {
+     "id": 3,
+     "x": 525.1,
+     "y": 310.2,
+     "w": 29.8,
+     "h": 29.8
+    }
+   ],
+   "truth": [
+    1,
+    3
+   ],
+   "models": {
+    "Qwen3-VL-4B-Instruct": [
+     1,
+     3
+    ],
+    "Qwen3-VL-8B-Instruct (FP8)": [
+     1,
+     2
+    ]
+   }
+  },
+  {
+   "game": "pool",
+   "id": "easy_0038",
+   "difficulty": "easy",
+   "still": "media/episodes/pool_easy_0038_labeled.png",
+   "context": "media/episodes/pool_easy_0038_context.mp4",
+   "outcome": "media/episodes/pool_easy_0038_outcome.mp4",
+   "targets": [
+    {
+     "id": 1,
+     "x": 94.6,
+     "y": 184.0,
+     "w": 26.0,
+     "h": 26.0
+    },
+    {
+     "id": 2,
+     "x": 53.5,
+     "y": 287.2,
+     "w": 26.0,
+     "h": 26.0
+    }
+   ],
+   "truth": [
+    2
+   ],
+   "models": {
+    "Qwen3-VL-4B-Instruct": [],
+    "Qwen3-VL-8B-Instruct (FP8)": []
+   }
+  },
+  {
+   "game": "pool",
+   "id": "easy_0080",
+   "difficulty": "easy",
+   "still": "media/episodes/pool_easy_0080_labeled.png",
+   "context": "media/episodes/pool_easy_0080_context.mp4",
+   "outcome": "media/episodes/pool_easy_0080_outcome.mp4",
+   "targets": [
+    {
+     "id": 1,
+     "x": 95.0,
+     "y": 173.8,
+     "w": 26.0,
+     "h": 26.0
+    },
+    {
+     "id": 2,
+     "x": 427.6,
+     "y": 107.80000000000001,
+     "w": 26.0,
+     "h": 26.0
+    }
+   ],
+   "truth": [],
+   "models": {
+    "Qwen3-VL-4B-Instruct": [],
+    "Qwen3-VL-8B-Instruct (FP8)": []
+   }
+  },
+  {
+   "game": "pool",
+   "id": "medium_0047",
+   "difficulty": "medium",
+   "still": "media/episodes/pool_medium_0047_labeled.png",
+   "context": "media/episodes/pool_medium_0047_context.mp4",
+   "outcome": "media/episodes/pool_medium_0047_outcome.mp4",
+   "targets": [
+    {
+     "id": 1,
+     "x": 306.3,
+     "y": 67.80000000000001,
+     "w": 26.0,
+     "h": 26.0
+    },
+    {
+     "id": 2,
+     "x": 127.2,
+     "y": 147.0,
+     "w": 26.0,
+     "h": 26.0
+    },
+    {
+     "id": 3,
+     "x": 260.1,
+     "y": 178.7,
+     "w": 26.0,
+     "h": 26.0
+    },
+    {
+     "id": 4,
+     "x": 331.5,
+     "y": 208.7,
+     "w": 26.0,
+     "h": 26.0
+    }
+   ],
+   "truth": [],
+   "models": {
+    "Qwen3-VL-4B-Instruct": [
+     1
+    ],
+    "Qwen3-VL-8B-Instruct (FP8)": []
+   }
+  },
+  {
+   "game": "pool",
+   "id": "medium_0084",
+   "difficulty": "medium",
+   "still": "media/episodes/pool_medium_0084_labeled.png",
+   "context": "media/episodes/pool_medium_0084_context.mp4",
+   "outcome": "media/episodes/pool_medium_0084_outcome.mp4",
+   "targets": [
+    {
+     "id": 1,
+     "x": 227.0,
+     "y": 152.0,
+     "w": 26.0,
+     "h": 26.0
+    },
+    {
+     "id": 2,
+     "x": 97.7,
+     "y": 144.9,
+     "w": 26.0,
+     "h": 26.0
+    },
+    {
+     "id": 3,
+     "x": 571.1,
+     "y": 90.0,
+     "w": 26.0,
+     "h": 26.0
+    }
+   ],
+   "truth": [],
+   "models": {
+    "Qwen3-VL-4B-Instruct": [
+     3
+    ],
+    "Qwen3-VL-8B-Instruct (FP8)": [
+     3
+    ]
+   }
+  },
+  {
+   "game": "pool",
+   "id": "medium_0094",
+   "difficulty": "medium",
+   "still": "media/episodes/pool_medium_0094_labeled.png",
+   "context": "media/episodes/pool_medium_0094_context.mp4",
+   "outcome": "media/episodes/pool_medium_0094_outcome.mp4",
+   "targets": [
+    {
+     "id": 1,
+     "x": 530.0,
+     "y": 132.9,
+     "w": 26.0,
+     "h": 26.0
+    },
+    {
+     "id": 2,
+     "x": 143.4,
+     "y": 173.7,
+     "w": 26.0,
+     "h": 26.0
+    },
+    {
+     "id": 3,
+     "x": 565.7,
+     "y": 271.6,
+     "w": 26.0,
+     "h": 26.0
+    },
+    {
+     "id": 4,
+     "x": 506.8,
+     "y": 234.2,
+     "w": 26.0,
+     "h": 26.0
+    }
+   ],
+   "truth": [],
+   "models": {
+    "Qwen3-VL-4B-Instruct": [
+     2
+    ],
+    "Qwen3-VL-8B-Instruct (FP8)": [
+     1,
+     3
+    ]
+   }
+  },
+  {
+   "game": "pool",
+   "id": "hard_0022",
+   "difficulty": "hard",
+   "still": "media/episodes/pool_hard_0022_labeled.png",
+   "context": "media/episodes/pool_hard_0022_context.mp4",
+   "outcome": "media/episodes/pool_hard_0022_outcome.mp4",
+   "targets": [
+    {
+     "id": 1,
+     "x": 241.0,
+     "y": 189.5,
+     "w": 26.0,
+     "h": 26.0
+    },
+    {
+     "id": 2,
+     "x": 253.8,
+     "y": 199.9,
+     "w": 26.0,
+     "h": 26.0
+    },
+    {
+     "id": 3,
+     "x": 256.4,
+     "y": 183.6,
+     "w": 26.0,
+     "h": 26.0
+    },
+    {
+     "id": 4,
+     "x": 266.6,
+     "y": 210.3,
+     "w": 26.0,
+     "h": 26.0
+    },
+    {
+     "id": 5,
+     "x": 269.2,
+     "y": 194.0,
+     "w": 26.0,
+     "h": 26.0
+    },
+    {
+     "id": 6,
+     "x": 271.9,
+     "y": 177.7,
+     "w": 26.0,
+     "h": 26.0
+    },
+    {
+     "id": 7,
+     "x": 72.6,
+     "y": 92.80000000000001,
+     "w": 26.0,
+     "h": 26.0
+    },
+    {
+     "id": 8,
+     "x": 58.8,
+     "y": 74.19999999999999,
+     "w": 26.0,
+     "h": 26.0
+    },
+    {
+     "id": 9,
+     "x": 486.4,
+     "y": 288.6,
+     "w": 26.0,
+     "h": 26.0
+    }
+   ],
+   "truth": [],
+   "models": {
+    "Qwen3-VL-4B-Instruct": [
+     7,
+     8,
+     9
+    ],
+    "Qwen3-VL-8B-Instruct (FP8)": []
+   }
+  },
+  {
+   "game": "pool",
+   "id": "hard_0037",
+   "difficulty": "hard",
+   "still": "media/episodes/pool_hard_0037_labeled.png",
+   "context": "media/episodes/pool_hard_0037_context.mp4",
+   "outcome": "media/episodes/pool_hard_0037_outcome.mp4",
+   "targets": [
+    {
+     "id": 1,
+     "x": 187.7,
+     "y": 159.2,
+     "w": 26.0,
+     "h": 26.0
+    },
+    {
+     "id": 2,
+     "x": 200.7,
+     "y": 149.1,
+     "w": 26.0,
+     "h": 26.0
+    },
+    {
+     "id": 3,
+     "x": 185.4,
+     "y": 142.9,
+     "w": 26.0,
+     "h": 26.0
+    },
+    {
+     "id": 4,
+     "x": 213.7,
+     "y": 139.0,
+     "w": 26.0,
+     "h": 26.0
+    },
+    {
+     "id": 5,
+     "x": 198.5,
+     "y": 132.8,
+     "w": 26.0,
+     "h": 26.0
+    },
+    {
+     "id": 6,
+     "x": 183.2,
+     "y": 126.6,
+     "w": 26.0,
+     "h": 26.0
+    },
+    {
+     "id": 7,
+     "x": 192.4,
+     "y": 63.19999999999999,
+     "w": 26.0,
+     "h": 26.0
+    },
+    {
+     "id": 8,
+     "x": 341.3,
+     "y": 83.19999999999999,
+     "w": 26.0,
+     "h": 26.0
+    },
+    {
+     "id": 9,
+     "x": 86.2,
+     "y": 284.1,
+     "w": 26.0,
+     "h": 26.0
+    }
+   ],
+   "truth": [],
+   "models": {
+    "Qwen3-VL-4B-Instruct": [
+     7,
+     8,
+     9
+    ],
+    "Qwen3-VL-8B-Instruct (FP8)": []
+   }
+  },
+  {
+   "game": "pool",
+   "id": "hard_0042",
+   "difficulty": "hard",
+   "still": "media/episodes/pool_hard_0042_labeled.png",
+   "context": "media/episodes/pool_hard_0042_context.mp4",
+   "outcome": "media/episodes/pool_hard_0042_outcome.mp4",
+   "targets": [
+    {
+     "id": 1,
+     "x": 358.3,
+     "y": 122.69999999999999,
+     "w": 26.0,
+     "h": 26.0
+    },
+    {
+     "id": 2,
+     "x": 354.3,
+     "y": 106.69999999999999,
+     "w": 26.0,
+     "h": 26.0
+    },
+    {
+     "id": 3,
+     "x": 342.4,
+     "y": 118.19999999999999,
+     "w": 26.0,
+     "h": 26.0
+    },
+    {
+     "id": 4,
+     "x": 350.3,
+     "y": 90.69999999999999,
+     "w": 26.0,
+     "h": 26.0
+    },
+    {
+     "id": 5,
+     "x": 338.4,
+     "y": 102.10000000000002,
+     "w": 26.0,
+     "h": 26.0
+    },
+    {
+     "id": 6,
+     "x": 326.5,
+     "y": 113.6,
+     "w": 26.0,
+     "h": 26.0
+    },
+    {
+     "id": 7,
+     "x": 361.7,
+     "y": 283.4,
+     "w": 26.0,
+     "h": 26.0
+    },
+    {
+     "id": 8,
+     "x": 79.7,
+     "y": 72.19999999999999,
+     "w": 26.0,
+     "h": 26.0
+    }
+   ],
+   "truth": [
+    8
+   ],
+   "models": {
+    "Qwen3-VL-4B-Instruct": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8
+    ],
+    "Qwen3-VL-8B-Instruct (FP8)": []
+   }
+  },
+  {
+   "game": "dominoes",
+   "id": "easy_0061",
+   "difficulty": "easy",
+   "still": "media/episodes/dominoes_easy_0061_labeled.png",
+   "context": "media/episodes/dominoes_easy_0061_context.mp4",
+   "outcome": "media/episodes/dominoes_easy_0061_outcome.mp4",
+   "targets": [
+    {
+     "id": 1,
+     "x": 182.5,
+     "y": 293.05,
+     "w": 18,
+     "h": 39.9
+    },
+    {
+     "id": 2,
+     "x": 219.0,
+     "y": 292.55,
+     "w": 18,
+     "h": 40.9
+    },
+    {
+     "id": 3,
+     "x": 262.8,
+     "y": 293.45,
+     "w": 18,
+     "h": 39.1
+    },
+    {
+     "id": 4,
+     "x": 286.5,
+     "y": 292.65,
+     "w": 18,
+     "h": 40.7
+    },
+    {
+     "id": 5,
+     "x": 331.8,
+     "y": 292.9,
+     "w": 18,
+     "h": 40.2
+    },
+    {
+     "id": 6,
+     "x": 347.9,
+     "y": 293.6,
+     "w": 18,
+     "h": 38.8
+    }
+   ],
+   "truth": [
+    1,
+    2,
+    3,
+    4
+   ],
+   "models": {
+    "Qwen3-VL-4B-Instruct": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6
+    ],
+    "Qwen3-VL-8B-Instruct (FP8)": []
+   }
+  },
+  {
+   "game": "dominoes",
+   "id": "easy_0063",
+   "difficulty": "easy",
+   "still": "media/episodes/dominoes_easy_0063_labeled.png",
+   "context": "media/episodes/dominoes_easy_0063_context.mp4",
+   "outcome": "media/episodes/dominoes_easy_0063_outcome.mp4",
+   "targets": [
+    {
+     "id": 1,
+     "x": 188.6,
+     "y": 292.8,
+     "w": 18,
+     "h": 40.4
+    },
+    {
+     "id": 2,
+     "x": 216.6,
+     "y": 292.95,
+     "w": 18,
+     "h": 40.1
+    },
+    {
+     "id": 3,
+     "x": 255.8,
+     "y": 292.5,
+     "w": 18,
+     "h": 41.0
+    },
+    {
+     "id": 4,
+     "x": 270.7,
+     "y": 293.1,
+     "w": 18,
+     "h": 39.8
+    },
+    {
+     "id": 5,
+     "x": 291.9,
+     "y": 293.45,
+     "w": 18,
+     "h": 39.1
+    }
+   ],
+   "truth": [
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "models": {
+    "Qwen3-VL-4B-Instruct": [
+     1,
+     2,
+     3,
+     4,
+     5
+    ],
+    "Qwen3-VL-8B-Instruct (FP8)": [
+     1,
+     2,
+     3,
+     4,
+     5
+    ]
+   }
+  },
+  {
+   "game": "dominoes",
+   "id": "medium_0007",
+   "difficulty": "medium",
+   "still": "media/episodes/dominoes_medium_0007_labeled.png",
+   "context": "media/episodes/dominoes_medium_0007_context.mp4",
+   "outcome": "media/episodes/dominoes_medium_0007_outcome.mp4",
+   "targets": [
+    {
+     "id": 1,
+     "x": 184.9,
+     "y": 286.6,
+     "w": 18,
+     "h": 52.8
+    },
+    {
+     "id": 2,
+     "x": 208.6,
+     "y": 290.75,
+     "w": 18,
+     "h": 44.5
+    },
+    {
+     "id": 3,
+     "x": 227.4,
+     "y": 286.55,
+     "w": 18,
+     "h": 52.9
+    },
+    {
+     "id": 4,
+     "x": 291.2,
+     "y": 289.05,
+     "w": 18,
+     "h": 47.9
+    },
+    {
+     "id": 5,
+     "x": 347.1,
+     "y": 296.05,
+     "w": 18,
+     "h": 33.9
+    },
+    {
+     "id": 6,
+     "x": 361.1,
+     "y": 290.25,
+     "w": 18,
+     "h": 45.5
+    },
+    {
+     "id": 7,
+     "x": 383.6,
+     "y": 293.25,
+     "w": 18,
+     "h": 39.5
+    },
+    {
+     "id": 8,
+     "x": 406.7,
+     "y": 294.35,
+     "w": 18,
+     "h": 37.3
+    }
+   ],
+   "truth": [
+    1,
+    2,
+    3
+   ],
+   "models": {
+    "Qwen3-VL-4B-Instruct": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8
+    ],
+    "Qwen3-VL-8B-Instruct (FP8)": []
+   }
+  },
+  {
+   "game": "dominoes",
+   "id": "medium_0036",
+   "difficulty": "medium",
+   "still": "media/episodes/dominoes_medium_0036_labeled.png",
+   "context": "media/episodes/dominoes_medium_0036_context.mp4",
+   "outcome": "media/episodes/dominoes_medium_0036_outcome.mp4",
+   "targets": [
+    {
+     "id": 1,
+     "x": 153.6,
+     "y": 293.35,
+     "w": 18,
+     "h": 39.3
+    },
+    {
+     "id": 2,
+     "x": 172.1,
+     "y": 288.05,
+     "w": 18,
+     "h": 49.9
+    },
+    {
+     "id": 3,
+     "x": 208.4,
+     "y": 289.75,
+     "w": 18,
+     "h": 46.5
+    },
+    {
+     "id": 4,
+     "x": 240.0,
+     "y": 289.95,
+     "w": 18,
+     "h": 46.1
+    },
+    {
+     "id": 5,
+     "x": 270.1,
+     "y": 287.05,
+     "w": 18,
+     "h": 51.9
+    },
+    {
+     "id": 6,
+     "x": 303.7,
+     "y": 287.5,
+     "w": 18,
+     "h": 51.0
+    }
+   ],
+   "truth": [],
+   "models": {
+    "Qwen3-VL-4B-Instruct": [
+     2,
+     3,
+     4,
+     5,
+     6
+    ],
+    "Qwen3-VL-8B-Instruct (FP8)": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6
+    ]
+   }
+  },
+  {
+   "game": "dominoes",
+   "id": "medium_0099",
+   "difficulty": "medium",
+   "still": "media/episodes/dominoes_medium_0099_labeled.png",
+   "context": "media/episodes/dominoes_medium_0099_context.mp4",
+   "outcome": "media/episodes/dominoes_medium_0099_outcome.mp4",
+   "targets": [
+    {
+     "id": 1,
+     "x": 156.9,
+     "y": 291.0,
+     "w": 18,
+     "h": 44.0
+    },
+    {
+     "id": 2,
+     "x": 185.6,
+     "y": 285.7,
+     "w": 18,
+     "h": 54.6
+    },
+    {
+     "id": 3,
+     "x": 240.6,
+     "y": 290.55,
+     "w": 18,
+     "h": 44.9
+    },
+    {
+     "id": 4,
+     "x": 272.6,
+     "y": 286.05,
+     "w": 18,
+     "h": 53.9
+    },
+    {
+     "id": 5,
+     "x": 329.1,
+     "y": 285.6,
+     "w": 18,
+     "h": 54.8
+    },
+    {
+     "id": 6,
+     "x": 359.5,
+     "y": 296.15,
+     "w": 18,
+     "h": 33.7
+    },
+    {
+     "id": 7,
+     "x": 380.4,
+     "y": 288.05,
+     "w": 18,
+     "h": 49.9
+    }
+   ],
+   "truth": [],
+   "models": {
+    "Qwen3-VL-4B-Instruct": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7
+    ],
+    "Qwen3-VL-8B-Instruct (FP8)": []
+   }
+  },
+  {
+   "game": "dominoes",
+   "id": "hard_0063",
+   "difficulty": "hard",
+   "still": "media/episodes/dominoes_hard_0063_labeled.png",
+   "context": "media/episodes/dominoes_hard_0063_context.mp4",
+   "outcome": "media/episodes/dominoes_hard_0063_outcome.mp4",
+   "targets": [
+    {
+     "id": 1,
+     "x": 157.7,
+     "y": 292.95,
+     "w": 18,
+     "h": 40.1
+    },
+    {
+     "id": 2,
+     "x": 184.8,
+     "y": 292.9,
+     "w": 18,
+     "h": 40.2
+    },
+    {
+     "id": 3,
+     "x": 211.2,
+     "y": 295.1,
+     "w": 18,
+     "h": 35.8
+    },
+    {
+     "id": 4,
+     "x": 230.9,
+     "y": 289.9,
+     "w": 18,
+     "h": 46.2
+    },
+    {
+     "id": 5,
+     "x": 252.9,
+     "y": 287.25,
+     "w": 18,
+     "h": 51.5
+    },
+    {
+     "id": 6,
+     "x": 309.2,
+     "y": 291.65,
+     "w": 18,
+     "h": 42.7
+    },
+    {
+     "id": 7,
+     "x": 335.7,
+     "y": 293.0,
+     "w": 18,
+     "h": 40.0
+    },
+    {
+     "id": 8,
+     "x": 359.4,
+     "y": 295.2,
+     "w": 18,
+     "h": 35.6
+    },
+    {
+     "id": 9,
+     "x": 379.9,
+     "y": 294.0,
+     "w": 18,
+     "h": 38.0
+    }
+   ],
+   "truth": [
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "models": {
+    "Qwen3-VL-4B-Instruct": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9
+    ],
+    "Qwen3-VL-8B-Instruct (FP8)": []
+   }
+  },
+  {
+   "game": "dominoes",
+   "id": "hard_0066",
+   "difficulty": "hard",
+   "still": "media/episodes/dominoes_hard_0066_labeled.png",
+   "context": "media/episodes/dominoes_hard_0066_context.mp4",
+   "outcome": "media/episodes/dominoes_hard_0066_outcome.mp4",
+   "targets": [
+    {
+     "id": 1,
+     "x": 154.4,
+     "y": 296.0,
+     "w": 18,
+     "h": 34.0
+    },
+    {
+     "id": 2,
+     "x": 173.3,
+     "y": 291.15,
+     "w": 18,
+     "h": 43.7
+    },
+    {
+     "id": 3,
+     "x": 217.9,
+     "y": 292.15,
+     "w": 18,
+     "h": 41.7
+    },
+    {
+     "id": 4,
+     "x": 241.1,
+     "y": 287.5,
+     "w": 18,
+     "h": 51.0
+    },
+    {
+     "id": 5,
+     "x": 268.8,
+     "y": 270.5,
+     "w": 18,
+     "h": 35.4
+    },
+    {
+     "id": 6,
+     "x": 287.2,
+     "y": 261.0,
+     "w": 18,
+     "h": 54.4
+    },
+    {
+     "id": 7,
+     "x": 340.7,
+     "y": 262.9,
+     "w": 18,
+     "h": 50.6
+    },
+    {
+     "id": 8,
+     "x": 396.7,
+     "y": 265.6,
+     "w": 18,
+     "h": 45.2
+    },
+    {
+     "id": 9,
+     "x": 451.5,
+     "y": 267.55,
+     "w": 18,
+     "h": 41.3
+    }
+   ],
+   "truth": [
+    1,
+    2
+   ],
+   "models": {
+    "Qwen3-VL-4B-Instruct": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9
+    ],
+    "Qwen3-VL-8B-Instruct (FP8)": []
+   }
+  },
+  {
+   "game": "dominoes",
+   "id": "hard_0097",
+   "difficulty": "hard",
+   "still": "media/episodes/dominoes_hard_0097_labeled.png",
+   "context": "media/episodes/dominoes_hard_0097_context.mp4",
+   "outcome": "media/episodes/dominoes_hard_0097_outcome.mp4",
+   "targets": [
+    {
+     "id": 1,
+     "x": 171.3,
+     "y": 289.8,
+     "w": 18,
+     "h": 46.4
+    },
+    {
+     "id": 2,
+     "x": 194.3,
+     "y": 289.55,
+     "w": 18,
+     "h": 46.9
+    },
+    {
+     "id": 3,
+     "x": 229.0,
+     "y": 287.45,
+     "w": 18,
+     "h": 51.1
+    },
+    {
+     "id": 4,
+     "x": 254.7,
+     "y": 289.25,
+     "w": 18,
+     "h": 47.5
+    },
+    {
+     "id": 5,
+     "x": 288.9,
+     "y": 292.15,
+     "w": 18,
+     "h": 41.7
+    },
+    {
+     "id": 6,
+     "x": 303.2,
+     "y": 285.25,
+     "w": 18,
+     "h": 55.5
+    },
+    {
+     "id": 7,
+     "x": 369.1,
+     "y": 291.55,
+     "w": 18,
+     "h": 42.9
+    },
+    {
+     "id": 8,
+     "x": 398.0,
+     "y": 288.3,
+     "w": 18,
+     "h": 49.4
+    },
+    {
+     "id": 9,
+     "x": 450.7,
+     "y": 282.1,
+     "w": 18,
+     "h": 32.4
+    },
+    {
+     "id": 10,
+     "x": 464.7,
+     "y": 271.4,
+     "w": 18,
+     "h": 53.8
+    },
+    {
+     "id": 11,
+     "x": 490.7,
+     "y": 278.85,
+     "w": 18,
+     "h": 38.9
+    }
+   ],
+   "truth": [
+    1,
+    2
+   ],
+   "models": {
+    "Qwen3-VL-4B-Instruct": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11
+    ],
+    "Qwen3-VL-8B-Instruct (FP8)": []
+   }
+  }
+ ]
+}

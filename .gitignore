@@ -1,9 +1,9 @@
-data/
-preds/
+/data/
+/preds/
 .venv/
 __pycache__/
-viz/
+/viz/
 models/*/.venv/
-analysis/
+/analysis/
 .claude/
-drafts/
+/drafts/
